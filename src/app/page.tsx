@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 
-// --- Flow Pattern Data ---
+// --- Flow Pattern Data (Commented out as unused for now) ---
+/*
 const flowPatterns = [
   { id: 'pattern1', name: 'Chrome Heart Dreams', description: '8-5-6-6 syllable structure, alternating rhymes, "Oops" anaphora.' },
   { id: 'pattern2', name: 'Designer Smoke', description: 'Consistent 4-5 syllables, strong couplet rhymes, "Verb up the noun" formula.' },
@@ -13,6 +14,7 @@ const flowPatterns = [
   { id: 'pattern7', name: 'Street Symphony', description: 'Long-short-long-short syllables, repetition callback, internal rhymes, dense imagery.' },
   { id: 'pattern8', name: 'Night Tales', description: 'Progressive line lengthening, consistent adlib punctuation, strong end rhymes.' },
 ];
+*/
 // --- End Flow Pattern Data ---
 
 // --- Agent Data (Updated) ---
@@ -29,11 +31,27 @@ const availableAgents: Agent[] = [
 ];
 // --- End Agent Data ---
 
+// Interface for the expected Analysis API response structure
+interface AnalysisResultData {
+  syllablesPerLine?: number[];
+  rhymeSchemeAnalysis?: string;
+  rhymeDetails?: { words: string[]; type: string }[];
+  rhythmAndPacing?: string;
+  repetitionTechniques?: string[];
+  overallComplexity?: string;
+  melodySuggestion?: string;
+  keyObservations?: string[];
+  formattedLyrics?: string;
+  parseError?: string; // Handle potential backend parse error
+  rawResponse?: string; // Include raw response if parse fails
+  // Add other potential fields if needed
+}
+
 export default function Home() {
   // --- State Variables ---
   const [lyricsInput, setLyricsInput] = useState(''); // For analysis input (middle panel)
   const [ideaInput, setIdeaInput] = useState(''); // For generation input (left panel)
-  const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResultData | null>(null); // Use the interface
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
 
@@ -84,9 +102,13 @@ export default function Home() {
       } else {
           setAnalysisResult(data);
       }
-    } catch (error: any) {
+    } catch (error) { // Handle unknown error type
       console.error("Analysis fetch error:", error);
-      setAnalysisError(error.message || "Failed to fetch analysis.");
+      let message = "Failed to fetch analysis.";
+      if (error instanceof Error) {
+          message = error.message;
+      }
+      setAnalysisError(message);
     } finally {
       setAnalysisLoading(false);
     }
@@ -115,9 +137,13 @@ export default function Home() {
       const data = await response.json();
        if (!response.ok) { throw new Error(data.error || `HTTP error! status: ${response.status}`); }
       setGeneratedLyrics(data.generatedLyrics);
-    } catch (error: any) {
+    } catch (error) { // Handle unknown error type
       console.error("Generation fetch error:", error);
-      setGenerationError(error.message || "Failed to fetch generation.");
+       let message = "Failed to fetch generation.";
+      if (error instanceof Error) {
+          message = error.message;
+      }
+      setGenerationError(message);
     } finally {
       setGenerationLoading(false);
     }

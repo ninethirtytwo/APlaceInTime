@@ -112,15 +112,23 @@ export async function POST(request: Request) {
       console.log("Claude Response Text:", generatedLyrics);
       return NextResponse.json({ generatedLyrics });
 
-    } catch (apiError: any) {
+    } catch (apiError) { // Use unknown or Error type
         console.error("Claude API Error during generation:", apiError);
+        let errorMessage = "Failed to generate lyrics via Claude API.";
+        if (apiError instanceof Error) {
+             errorMessage = `Failed to generate lyrics via Claude API: ${apiError.message}`;
+        }
         // Anthropic SDK might have specific error types/codes for safety or other issues
-        return NextResponse.json({ error: `Failed to generate lyrics via Claude API: ${apiError.message}` }, { status: 500 });
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 
-  } catch (error) {
+  } catch (error) { // Use unknown or Error type
     // General error handling
     console.error("General Generation API Error:", error);
-    return NextResponse.json({ error: "An unexpected error occurred during generation." }, { status: 500 });
+    let generalErrorMessage = "An unexpected error occurred during generation.";
+     if (error instanceof Error) {
+        generalErrorMessage = `An unexpected error occurred during generation: ${error.message}`;
+    }
+    return NextResponse.json({ error: generalErrorMessage }, { status: 500 });
   }
 }

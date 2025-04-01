@@ -99,14 +99,22 @@ JSON Output:`;
 
       return NextResponse.json(analysisResults);
 
-    } catch (apiError: any) {
+    } catch (apiError) {
         console.error("Claude API Error during analysis:", apiError);
-        return NextResponse.json({ error: `Failed to analyze lyrics via Claude API: ${apiError.message}` }, { status: 500 });
+        let errorMessage = "Failed to analyze lyrics via Claude API.";
+        if (apiError instanceof Error) {
+            errorMessage = `Failed to analyze lyrics via Claude API: ${apiError.message}`;
+        }
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 
   } catch (error) {
     // General error handling
     console.error("General Analysis API Error:", error);
-    return NextResponse.json({ error: "An unexpected error occurred during analysis." }, { status: 500 });
+    let generalErrorMessage = "An unexpected error occurred during analysis.";
+     if (error instanceof Error) {
+        generalErrorMessage = `An unexpected error occurred during analysis: ${error.message}`;
+    }
+    return NextResponse.json({ error: generalErrorMessage }, { status: 500 });
   }
 }
