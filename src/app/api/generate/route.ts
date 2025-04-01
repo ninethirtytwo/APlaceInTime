@@ -6,6 +6,16 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || '',
 });
 
+// Define a basic interface for the expected analysis context
+interface AnalysisContext {
+  syllablesPerLine?: number[];
+  rhymeSchemeAnalysis?: string;
+  rhythmAndPacing?: string;
+  overallComplexity?: string;
+  // Add other fields if they are consistently used in the prompt logic
+  [key: string]: any; // Allow other properties, but avoid using 'any' directly if possible
+}
+
 // Helper function to build the Claude prompt based on agents, parameters, and analysis context
 function buildAgentPrompt(
     idea: string,
@@ -13,8 +23,8 @@ function buildAgentPrompt(
     genre: string,
     era: string,
     mood: string,
-    contextLyrics?: string | null, // Allow null
-    analysisContext?: any // Add analysis results object
+    contextLyrics?: string | null,
+    analysisContext?: AnalysisContext | null // Use the interface, allow null
 ): string {
   let prompt = `You are an expert songwriting assistant collaborating with a user, acting as a specific AI writing team member or a lead integrating multiple perspectives. `;
 
