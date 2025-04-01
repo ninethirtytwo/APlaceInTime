@@ -13,7 +13,7 @@ interface AnalysisContext {
   rhythmAndPacing?: string;
   overallComplexity?: string;
   // Add other fields if they are consistently used in the prompt logic
-  [key: string]: any; // Allow other properties, but avoid using 'any' directly if possible
+  [key: string]: unknown; // Use unknown instead of any for index signature
 }
 
 // Helper function to build the Claude prompt based on agents, parameters, and analysis context
