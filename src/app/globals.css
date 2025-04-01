@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Force dark theme colors */
+  --background: #0a0a0a; /* Dark background */
+  --foreground: #ededed; /* Light text */
 }
 
 @theme inline {
@@ -12,15 +13,17 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* Removed @media query for dark mode preference to force dark theme */
 
 body {
-  background: var(--background);
+  /* background: var(--background); */ /* Replaced by image */
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-image: url('/bonfiree44.jpeg'); /* Updated background image */
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed; /* Keep background fixed during scroll */
+  min-height: 100vh;
+  /* Apply blur directly to background - might affect performance, alternative is pseudo-element */
+  /* filter: blur(5px); */ /* Let's skip direct blur for now, use backdrop-filter on content */
+  /* font-family is handled by Tailwind and layout.tsx */
 }
