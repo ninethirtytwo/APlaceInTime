@@ -68,9 +68,7 @@ export default function SpotifyArtistInfo() {
                 />
             )}
             <h4 className="text-xl font-semibold text-white mt-2">{artistData.name || 'Artist Name'}</h4>
-            {artistData.followers && (
-                 <p className="text-sm text-gray-400">{artistData.followers.toLocaleString()} Followers</p>
-            )}
+            {/* Follower count removed */}
              {artistData.genres && artistData.genres.length > 0 && (
                  <p className="text-xs text-gray-500 italic">{artistData.genres.join(', ')}</p>
             )}

@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import SpotifyArtistInfo from '@/components/SpotifyArtistInfo'; // Import the new component
+import SpotifyArtistInfo from '@/components/SpotifyArtistInfo';
+import SpotifyTopSongs from '@/components/SpotifyTopSongs'; // Import the top songs component
 
-// --- Agent Data (Keep as is) ---
+// --- Agent Data (Updated) ---
 interface Agent { id: string; name: string; description: string; }
 const availableAgents: Agent[] = [
     { id: 'lead', name: 'Lead Writer', description: 'Supervises and integrates styles.' },
@@ -125,7 +126,7 @@ export default function Home() {
            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 backdrop-blur-lg bg-black/40 p-6 sm:p-8 rounded-xl shadow-2xl border border-white/10">
               {/* --- Left Panel: Generator --- */}
               <div className="flex flex-col gap-5 min-h-[70vh]">
-                {/* Title moved to section header */}
+                <h3 className="text-xl font-semibold text-white border-b border-white/20 pb-2">AI Generator</h3>
                  {/* Idea Input */}
                  <div className="flex flex-col gap-2">
                    <label htmlFor="idea-input" className="text-sm font-medium text-gray-300">Your Idea / Prompt:</label>
@@ -220,21 +221,27 @@ export default function Home() {
             </div>
         </section>
 
-        {/* --- My Music Section --- */}
-         <section className="w-full max-w-4xl my-16 sm:my-24 text-center backdrop-blur-sm bg-black/30 p-6 rounded-lg border border-white/10">
-             <h2 className="text-3xl font-bold mb-4 text-white">My Music</h2>
-             <p className="text-md text-gray-300 mb-6">Experience my beats and tracks – always loaded and ready to play.</p>
-             {/* Use the SpotifyArtistInfo component */}
-             <div className="mb-6 flex items-center justify-center">
-                <SpotifyArtistInfo />
+        {/* --- Music Section (Combined Artist + Top Songs) --- */}
+         <section className="w-full max-w-6xl my-16 sm:my-24 backdrop-blur-sm bg-black/30 p-6 sm:p-8 rounded-lg border border-white/10">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
+                 {/* My Artist Info Column */}
+                 <div className="flex flex-col items-center">
+                     <h3 className="text-2xl font-bold mb-4 text-white">My Music</h3>
+                     <p className="text-sm text-gray-300 mb-6 text-center">Experience my beats and tracks.</p>
+                     <SpotifyArtistInfo />
+                     {/* Analyze button removed for now */}
+                 </div>
+                 {/* Top Songs Column */}
+                 <div className="flex flex-col items-center">
+                      <h3 className="text-2xl font-bold mb-4 text-white">Top Global Songs</h3>
+                      <p className="text-sm text-gray-300 mb-6 text-center">Current hits on Spotify.</p>
+                      <SpotifyTopSongs />
+                 </div>
              </div>
-             <button className="mt-1 px-5 py-2 rounded bg-white/10 hover:bg-white/20 border border-white/30 text-white font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed" disabled> {/* Disabled for now */}
-               Analyze My Music
-             </button>
         </section>
 
         {/* --- About Me Section --- */}
-        <section className="w-full max-w-4xl my-16 sm:my-24 text-center backdrop-blur-sm bg-black/30 p-6 rounded-lg border border-white/10">
+        <section className="w-full max-w-4xl my-16 sm:my-24 text-center backdrop-blur-sm bg-black/30 p-6 sm:p-8 rounded-lg border border-white/10">
              <h2 className="text-3xl font-bold mb-8 text-white">About Me</h2>
              {/* Image Collage */}
              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8 max-w-md mx-auto">
@@ -250,7 +257,6 @@ export default function Home() {
                     </div>
                 ))}
              </div>
-             {/* <img src="/your-photo.jpg" alt="BryAlvin XII" className="w-32 h-32 rounded-full mx-auto mb-4 border-2 border-white/20"/> */}
              <p className="text-md text-gray-200 mb-4 max-w-2xl mx-auto">
                 Hey, I’m <span className="font-semibold">BryAlvin XII</span> – a record producer and artist originally from Kampala, Uganda and now based in Berlin. I built this AI tool to break creative boundaries and help fellow artists overcome writer’s block. My journey in music has always been about blending tradition with innovation, and this platform is a testament to that passion. Whether you’re here to craft the next hit lyric or discover fresh beats, I’m excited to share my world with you.
              </p>
