@@ -70,6 +70,13 @@ export default function Home() {
   const [geniusLoading, setGeniusLoading] = useState(false);
   const [geniusError, setGeniusError] = useState<string | null>(null);
 
+  // State for Musixmatch Lyrics Search
+  const [musixmatchTrack, setMusixmatchTrack] = useState(''); // Track to search for
+  const [musixmatchArtist, setMusixmatchArtist] = useState(''); // Artist to search for
+  const [musixmatchLyrics, setMusixmatchLyrics] = useState<string | null>(null);
+  const [musixmatchLoading, setMusixmatchLoading] = useState(false);
+  const [musixmatchError, setMusixmatchError] = useState<string | null>(null);
+
   // --- Handler Functions ---
   const handleAgentSelection = (agentId: string) => {
     setSelectedAgents(prev =>
@@ -156,6 +163,33 @@ export default function Home() {
       setGeniusLoading(false);
     }
   }
+  // --- Musixmatch Lyrics Search Handler ---
+  async function handleMusixmatchSearch(track: string, artist: string) {
+    if (!track || !artist) {
+      setMusixmatchError("Track and Artist names are needed to search lyrics.");
+      return;
+    }
+    setMusixmatchLoading(true);
+    setMusixmatchError(null);
+    setMusixmatchLyrics(null);
+    try {
+      const response = await fetch(`/api/musixmatch/lyrics?track=${encodeURIComponent(track)}&artist=${encodeURIComponent(artist)}`);
+      const data = await response.json();
+      if (!response.ok || data.error) {
+        throw new Error(data.error || data.message || 'Failed to fetch lyrics from Musixmatch');
+      }
+      if (data.lyrics) {
+        setMusixmatchLyrics(data.lyrics);
+      } else {
+        setMusixmatchError(data.message || "Lyrics not found.");
+      }
+    } catch (error) {
+      console.error("Musixmatch search fetch error:", error);
+      setMusixmatchError(error instanceof Error ? error.message : "Failed to search Musixmatch.");
+    } finally {
+      setMusixmatchLoading(false);
+    }
+  }
   // --- End Handler Functions & Audio ---
 
   return (
@@ -232,6 +266,49 @@ export default function Home() {
                       </>
                     )}
                     {!analysisResult && !analysisLoading && !analysisError && ( <p className="text-sm text-gray-500 italic">(Analysis results will appear here...)</p> )}
+                 </div>
+
+                 {/* --- Genius/Musixmatch Search --- */}
+                 <div className="mt-6 pt-4 border-t border-white/10">
+                    <h4 className="text-md font-semibold mb-3 text-gray-200">Find Lyrics (via Musixmatch)</h4>
+                    <div className="flex gap-2 items-center">
+                        <input
+                            type="text"
+                            placeholder="Enter Song Title - Artist"
+                            value={geniusQuery} // Re-using geniusQuery state for simplicity now
+                            onChange={(e) => setGeniusQuery(e.target.value)}
+                            className="flex-grow p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100"
+                            disabled={musixmatchLoading}
+                        />
+                        <button
+                            onClick={() => {
+                                // Basic parsing attempt: Assumes "Title - Artist" format
+                                const parts = geniusQuery.split('-').map(p => p.trim());
+                                const track = parts[0];
+                                const artist = parts.length > 1 ? parts.slice(1).join(' ') : ''; // Handle artists with hyphens
+                                if (track && artist) {
+                                    handleMusixmatchSearch(track, artist);
+                                } else {
+                                    setMusixmatchError("Please enter in 'Title - Artist' format.");
+                                }
+                            }}
+                            className="px-4 py-2 rounded bg-purple-600/80 hover:bg-purple-500/80 text-white text-sm font-medium transition-colors duration-200 disabled:opacity-50"
+                            disabled={musixmatchLoading || !geniusQuery}
+                        >
+                            {musixmatchLoading ? 'Searching...' : 'Search'}
+                        </button>
+                    </div>
+                    {/* Musixmatch Results Area */}
+                    <div className="mt-4 p-3 rounded bg-black/30 border border-white/10 min-h-[100px] max-h-[300px] overflow-y-auto text-xs">
+                        {musixmatchLoading && <p className="text-gray-400 italic">Loading lyrics...</p>}
+                        {musixmatchError && <p className="text-red-400">Error: {musixmatchError}</p>}
+                        {musixmatchLyrics && !musixmatchLoading && !musixmatchError && (
+                            <pre className="whitespace-pre-wrap text-gray-200">{musixmatchLyrics}</pre>
+                        )}
+                        {!musixmatchLyrics && !musixmatchLoading && !musixmatchError && (
+                            <p className="text-gray-500 italic">(Lyrics will appear here if found...)</p>
+                        )}
+                    </div>
                  </div>
               </div>
 
