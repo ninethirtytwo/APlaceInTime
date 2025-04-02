@@ -47,7 +47,8 @@ export async function GET(request: Request) {
       try {
           const jsonError = JSON.parse(errorBody);
           specificError = jsonError?.message || specificError;
-      } catch (_e) { /* Ignore parsing error, variable intentionally unused */ }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_e) { /* Ignore parsing error */ }
       throw new Error(specificError);
     }
 
