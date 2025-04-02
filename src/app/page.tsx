@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import SpotifyArtistInfo from '@/components/SpotifyArtistInfo';
+// Removed import for SpotifyArtistInfo as we use iframe now
 // Removed import for SpotifyTopSongs as we use iframe now
 
 // --- Agent Data (Updated) ---
@@ -156,16 +156,6 @@ export default function Home() {
       setGeniusLoading(false);
     }
   }
-  // Function to pause background audio, potentially called on iframe interaction
-  const pauseBackgroundAudio = () => {
-      if (audioRef.current && !audioRef.current.paused) {
-          console.log("Pausing background audio due to potential Spotify interaction.");
-          audioRef.current.pause();
-          // We could also mute here if pausing isn't reliable enough
-          // audioRef.current.muted = true;
-          // setIsMuted(true);
-      }
-  };
   // --- End Handler Functions & Audio ---
 
   return (
@@ -296,7 +286,15 @@ export default function Home() {
                  <div className="flex flex-col items-center">
                      <h3 className="text-2xl font-bold mb-4 text-white">My Music</h3>
                      <p className="text-sm text-gray-300 mb-6 text-center">Experience my beats and tracks.</p>
-                     <SpotifyArtistInfo />
+                     {/* Replace component with Artist Embed iframe */}
+                     <iframe
+                        style={{ borderRadius: '12px', border: 'none', width: '100%', maxWidth: '400px', height: '352px' }} // Added border:none, max-width
+                        src="https://open.spotify.com/embed/artist/3i7KKztiuNxSgo146aHLIZ?utm_source=generator&theme=0" // Using theme=0 for dark
+                        allowFullScreen={false}
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                        loading="lazy"
+                        title="Spotify Artist Embed - BryAlvin XII"
+                      ></iframe>
                      {/* Analyze button removed for now */}
                  </div>
                  {/* Top Songs Column */}
