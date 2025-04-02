@@ -56,7 +56,7 @@ export async function GET() {
     console.log(`Fetching Spotify artist data for ID: ${ARTIST_ID}...`);
     // Fetch artist details and top tracks
     const artistUrl = `${SPOTIFY_API_BASE}/artists/${ARTIST_ID}`;
-    const topTracksUrl = `${SPOTIFY_API_BASE}/artists/${ARTIST_ID}/top-tracks?market=US&limit=5`; // Fetch top 5
+    const topTracksUrl = `${SPOTIFY_API_BASE}/artists/${ARTIST_ID}/top-tracks?market=US&limit=3`; // Fetch top 3
 
     const [artistResponse, topTracksResponse] = await Promise.all([
         fetch(artistUrl, { headers: { 'Authorization': `Bearer ${accessToken}` } }),
@@ -88,7 +88,7 @@ export async function GET() {
         genres: artistData.genres,
         externalUrl: artistData.external_urls?.spotify,
         // Map fetched tracks (up to 5)
-        topTracks: topTracksData.tracks?.map((track: any) => ({
+        topTracks: topTracksData.tracks?.map((track: any) => ({ // Keep 'any' here for simplicity or define a full Track object type
             name: track.name,
             url: track.external_urls?.spotify,
             albumImageUrl: track.album?.images?.[2]?.url // Get smallest album image
