@@ -156,6 +156,16 @@ export default function Home() {
       setGeniusLoading(false);
     }
   }
+  // Function to pause background audio, potentially called on iframe interaction
+  const pauseBackgroundAudio = () => {
+      if (audioRef.current && !audioRef.current.paused) {
+          console.log("Pausing background audio due to potential Spotify interaction.");
+          audioRef.current.pause();
+          // We could also mute here if pausing isn't reliable enough
+          // audioRef.current.muted = true;
+          // setIsMuted(true);
+      }
+  };
   // --- End Handler Functions & Audio ---
 
   return (
