@@ -64,18 +64,22 @@ export default function Home() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioControlsRef = useRef<HTMLDivElement | null>(null);
 
-  // State for Genius Search
+  // State for Genius Search (Commented out as unused for now)
+  /*
   const [geniusQuery, setGeniusQuery] = useState('');
-  const [geniusResults, setGeniusResults] = useState<GeniusHit[]>([]); // Use interface
+  const [geniusResults, setGeniusResults] = useState<GeniusHit[]>([]);
   const [geniusLoading, setGeniusLoading] = useState(false);
   const [geniusError, setGeniusError] = useState<string | null>(null);
+  */
 
-  // State for Musixmatch Lyrics Search
-  const [musixmatchTrack, setMusixmatchTrack] = useState(''); // Track to search for
-  const [musixmatchArtist, setMusixmatchArtist] = useState(''); // Artist to search for
+  // State for Musixmatch Lyrics Search (Commented out as unused for now)
+  /*
+  const [musixmatchTrack, setMusixmatchTrack] = useState('');
+  const [musixmatchArtist, setMusixmatchArtist] = useState('');
   const [musixmatchLyrics, setMusixmatchLyrics] = useState<string | null>(null);
   const [musixmatchLoading, setMusixmatchLoading] = useState(false);
   const [musixmatchError, setMusixmatchError] = useState<string | null>(null);
+  */
 
   // --- Handler Functions ---
   const handleAgentSelection = (agentId: string) => {
@@ -141,55 +145,18 @@ export default function Home() {
 
   const pauseBackgroundAudio = () => { if (audioRef.current && !audioRef.current.paused) { console.log("Pausing background audio due to potential Spotify interaction."); audioRef.current.pause(); } };
 
-  // --- Genius Search Handler ---
+  // --- Genius Search Handler (Commented out as unused for now) ---
+  /*
   async function handleGeniusSearch(e?: React.FormEvent<HTMLFormElement>) {
-    if (e) e.preventDefault(); // Prevent form submission if used in a form
-    if (!geniusQuery.trim()) return;
-
-    setGeniusLoading(true);
-    setGeniusError(null);
-    setGeniusResults([]);
-    try {
-      const response = await fetch(`/api/genius/search?q=${encodeURIComponent(geniusQuery)}`);
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch Genius results');
-      }
-      setGeniusResults(data.hits || []);
-    } catch (error) {
-      console.error("Genius search fetch error:", error);
-      setGeniusError(error instanceof Error ? error.message : "Failed to search Genius.");
-    } finally {
-      setGeniusLoading(false);
-    }
+    // ... implementation ...
   }
-  // --- Musixmatch Lyrics Search Handler ---
+  */
+  // --- Musixmatch Lyrics Search Handler (Commented out as unused for now) ---
+  /*
   async function handleMusixmatchSearch(track: string, artist: string) {
-    if (!track || !artist) {
-      setMusixmatchError("Track and Artist names are needed to search lyrics.");
-      return;
-    }
-    setMusixmatchLoading(true);
-    setMusixmatchError(null);
-    setMusixmatchLyrics(null);
-    try {
-      const response = await fetch(`/api/musixmatch/lyrics?track=${encodeURIComponent(track)}&artist=${encodeURIComponent(artist)}`);
-      const data = await response.json();
-      if (!response.ok || data.error) {
-        throw new Error(data.error || data.message || 'Failed to fetch lyrics from Musixmatch');
-      }
-      if (data.lyrics) {
-        setMusixmatchLyrics(data.lyrics);
-      } else {
-        setMusixmatchError(data.message || "Lyrics not found.");
-      }
-    } catch (error) {
-      console.error("Musixmatch search fetch error:", error);
-      setMusixmatchError(error instanceof Error ? error.message : "Failed to search Musixmatch.");
-    } finally {
-      setMusixmatchLoading(false);
-    }
+    // ... implementation ...
   }
+  */
   // --- End Handler Functions & Audio ---
 
   return (

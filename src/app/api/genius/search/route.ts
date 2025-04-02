@@ -38,8 +38,18 @@ export async function GET(request: Request) {
     const data = await response.json();
     console.log("Successfully fetched Genius search results.");
 
+    // Define simple type for Genius hit structure
+    interface GeniusHitItem {
+        result?: {
+            id?: number;
+            title?: string;
+            primary_artist?: { name?: string };
+            url?: string;
+            song_art_image_thumbnail_url?: string;
+        }
+    }
     // Extract relevant hit info (e.g., top 5 hits)
-    const hits = data.response?.hits?.slice(0, 5).map((hit: any) => ({
+    const hits = data.response?.hits?.slice(0, 5).map((hit: GeniusHitItem) => ({
         id: hit.result?.id,
         title: hit.result?.title,
         artist: hit.result?.primary_artist?.name,

@@ -46,8 +46,8 @@ export async function GET(request: Request) {
       let specificError = `Failed to fetch lyrics: ${response.statusText}`;
       try {
           const jsonError = JSON.parse(errorBody);
-          specificError = jsonError?.message || specificError; // Use message from JSON if available
-      } catch (e) { /* Ignore parsing error */ }
+          specificError = jsonError?.message || specificError;
+      } catch (_e) { /* Ignore parsing error, variable intentionally unused */ }
       throw new Error(specificError);
     }
 
