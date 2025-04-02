@@ -74,14 +74,13 @@ export default function Home() {
   const [geniusError, setGeniusError] = useState<string | null>(null);
   */
 
-  // State for Musixmatch Lyrics Search (Commented out as unused for now)
-  /*
-  const [musixmatchTrack, setMusixmatchTrack] = useState('');
-  const [musixmatchArtist, setMusixmatchArtist] = useState('');
+  // State for Musixmatch Lyrics Search
+  const [musixmatchTrack, setMusixmatchTrack] = useState(''); // Track to search for (can be set automatically later)
+  const [musixmatchArtist, setMusixmatchArtist] = useState(''); // Artist to search for (can be set automatically later)
   const [musixmatchLyrics, setMusixmatchLyrics] = useState<string | null>(null);
   const [musixmatchLoading, setMusixmatchLoading] = useState(false);
   const [musixmatchError, setMusixmatchError] = useState<string | null>(null);
-  */
+  const [lyricsSearchQuery, setLyricsSearchQuery] = useState(''); // State for the lyrics search input
 
   // --- Handler Functions ---
   const handleAgentSelection = (agentId: string) => {
@@ -120,8 +119,8 @@ export default function Home() {
   // --- Audio Handling ---
   useEffect(() => {
     if (!audioRef.current) {
-        audioRef.current = new Audio('/ocean.wav.wav'); // Ensure correct path
-        audioRef.current.onerror = (e) => { console.error("Audio Error Event:", e); if (audioRef.current) audioRef.current.src = '/ocean.wav.wav'; };
+        audioRef.current = new Audio('/sandy-beach-calm-waves-water-nature-sounds-8052.mp3'); // Use sandy beach sound
+        audioRef.current.onerror = (e) => { console.error("Audio Error Event:", e); if (audioRef.current) audioRef.current.src = '/sandy-beach-calm-waves-water-nature-sounds-8052.mp3'; }; // Update fallback src too
     }
     if (audioRef.current) {
         audioRef.current.loop = true;
@@ -153,12 +152,33 @@ export default function Home() {
     // ... implementation ...
   }
   */
-  // --- Musixmatch Lyrics Search Handler (Commented out as unused for now) ---
-  /*
+  // --- Musixmatch Lyrics Search Handler ---
   async function handleMusixmatchSearch(track: string, artist: string) {
-    // ... implementation ...
+    if (!track || !artist) {
+      setMusixmatchError("Track and Artist names are needed to search lyrics.");
+      return;
+    }
+    setMusixmatchLoading(true);
+    setMusixmatchError(null);
+    setMusixmatchLyrics(null);
+    try {
+      const response = await fetch(`/api/musixmatch/lyrics?track=${encodeURIComponent(track)}&artist=${encodeURIComponent(artist)}`);
+      const data = await response.json();
+      if (!response.ok || data.error) {
+        throw new Error(data.error || data.message || 'Failed to fetch lyrics from Musixmatch');
+      }
+      if (data.lyrics) {
+        setMusixmatchLyrics(data.lyrics);
+      } else {
+        setMusixmatchError(data.message || "Lyrics not found.");
+      }
+    } catch (error) {
+      console.error("Musixmatch search fetch error:", error);
+      setMusixmatchError(error instanceof Error ? error.message : "Failed to search Musixmatch.");
+    } finally {
+      setMusixmatchLoading(false);
+    }
   }
-  */
   // --- End Handler Functions & Audio ---
 
   return (
@@ -237,12 +257,51 @@ export default function Home() {
                     {!analysisResult && !analysisLoading && !analysisError && ( <p className="text-sm text-gray-500 italic">(Analysis results will appear here...)</p> )}
                  </div>
 
-                 {/* Genius/Musixmatch Search UI commented out for now */}
-                 {/*
+                 {/* --- Genius/Musixmatch Search --- */}
                  <div className="mt-6 pt-4 border-t border-white/10">
-                    // ... UI elements ...
+                    <h4 className="text-md font-semibold mb-3 text-gray-200">Find Lyrics (via Musixmatch)</h4>
+                    {/* We'll reuse the geniusQuery state for the input for now */}
+                    {/* Use a form for potential Enter key submission, call Musixmatch handler */}
+                    <form onSubmit={(e) => {
+                        e.preventDefault(); // Prevent default form submission
+                        // Basic parsing attempt: Assumes "Title - Artist" format
+                        const parts = lyricsSearchQuery.split('-').map((p: string) => p.trim()); // Use lyricsSearchQuery and type 'p'
+                        const track = parts[0];
+                        const artist = parts.length > 1 ? parts.slice(1).join(' ') : '';
+                        if (track && artist) {
+                            handleMusixmatchSearch(track, artist);
+                        } else {
+                            setMusixmatchError("Please enter in 'Title - Artist' format.");
+                        }
+                    }} className="flex gap-2 items-center">
+                        <input
+                            type="text"
+                            placeholder="Enter Song Title - Artist"
+                            value={lyricsSearchQuery}
+                            onChange={(e) => setLyricsSearchQuery(e.target.value)}
+                            className="flex-grow p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100"
+                            disabled={musixmatchLoading} // Use musixmatch loading state
+                        />
+                        {/* Button type is submit by default within a form */}
+                        <button
+                            className="px-4 py-2 rounded bg-purple-600/80 hover:bg-purple-500/80 text-white text-sm font-medium transition-colors duration-200 disabled:opacity-50"
+                            disabled={musixmatchLoading || !lyricsSearchQuery} // Disable based on musixmatch loading and lyrics search query
+                        >
+                            {musixmatchLoading ? 'Searching...' : 'Search'}
+                        </button>
+                    </form>
+                    {/* Musixmatch Results Area */}
+                    <div className="mt-4 p-3 rounded bg-black/30 border border-white/10 min-h-[100px] max-h-[300px] overflow-y-auto text-xs">
+                        {musixmatchLoading && <p className="text-gray-400 italic">Loading lyrics...</p>}
+                        {musixmatchError && <p className="text-red-400">Error: {musixmatchError}</p>}
+                        {musixmatchLyrics && !musixmatchLoading && !musixmatchError && (
+                            <pre className="whitespace-pre-wrap text-gray-200">{musixmatchLyrics}</pre>
+                        )}
+                        {!musixmatchLyrics && !musixmatchLoading && !musixmatchError && (
+                            <p className="text-gray-500 italic">(Lyrics will appear here if found...)</p>
+                        )}
+                    </div>
                  </div>
-                 */}
               </div>
 
               {/* --- Right Panel: AI Writing Team --- */}
