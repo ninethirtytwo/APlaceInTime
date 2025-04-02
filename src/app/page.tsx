@@ -34,7 +34,8 @@ interface AnalysisResultData {
   rawResponse?: string;
 }
 
-// Interface for Genius Search results
+// Interface for Genius Search results (Commented out as unused)
+/*
 interface GeniusHit {
     id: number;
     title: string;
@@ -42,6 +43,7 @@ interface GeniusHit {
     url: string;
     thumbnailUrl?: string;
 }
+*/
 
 export default function Home() {
   // --- State Variables ---
@@ -235,48 +237,12 @@ export default function Home() {
                     {!analysisResult && !analysisLoading && !analysisError && ( <p className="text-sm text-gray-500 italic">(Analysis results will appear here...)</p> )}
                  </div>
 
-                 {/* --- Genius/Musixmatch Search --- */}
+                 {/* Genius/Musixmatch Search UI commented out for now */}
+                 {/*
                  <div className="mt-6 pt-4 border-t border-white/10">
-                    <h4 className="text-md font-semibold mb-3 text-gray-200">Find Lyrics (via Musixmatch)</h4>
-                    <div className="flex gap-2 items-center">
-                        <input
-                            type="text"
-                            placeholder="Enter Song Title - Artist"
-                            value={geniusQuery} // Re-using geniusQuery state for simplicity now
-                            onChange={(e) => setGeniusQuery(e.target.value)}
-                            className="flex-grow p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100"
-                            disabled={musixmatchLoading}
-                        />
-                        <button
-                            onClick={() => {
-                                // Basic parsing attempt: Assumes "Title - Artist" format
-                                const parts = geniusQuery.split('-').map(p => p.trim());
-                                const track = parts[0];
-                                const artist = parts.length > 1 ? parts.slice(1).join(' ') : ''; // Handle artists with hyphens
-                                if (track && artist) {
-                                    handleMusixmatchSearch(track, artist);
-                                } else {
-                                    setMusixmatchError("Please enter in 'Title - Artist' format.");
-                                }
-                            }}
-                            className="px-4 py-2 rounded bg-purple-600/80 hover:bg-purple-500/80 text-white text-sm font-medium transition-colors duration-200 disabled:opacity-50"
-                            disabled={musixmatchLoading || !geniusQuery}
-                        >
-                            {musixmatchLoading ? 'Searching...' : 'Search'}
-                        </button>
-                    </div>
-                    {/* Musixmatch Results Area */}
-                    <div className="mt-4 p-3 rounded bg-black/30 border border-white/10 min-h-[100px] max-h-[300px] overflow-y-auto text-xs">
-                        {musixmatchLoading && <p className="text-gray-400 italic">Loading lyrics...</p>}
-                        {musixmatchError && <p className="text-red-400">Error: {musixmatchError}</p>}
-                        {musixmatchLyrics && !musixmatchLoading && !musixmatchError && (
-                            <pre className="whitespace-pre-wrap text-gray-200">{musixmatchLyrics}</pre>
-                        )}
-                        {!musixmatchLyrics && !musixmatchLoading && !musixmatchError && (
-                            <p className="text-gray-500 italic">(Lyrics will appear here if found...)</p>
-                        )}
-                    </div>
+                    // ... UI elements ...
                  </div>
+                 */}
               </div>
 
               {/* --- Right Panel: AI Writing Team --- */}
@@ -379,11 +345,11 @@ export default function Home() {
                 Hey, I’m <span className="font-semibold">BryAlvin XII</span> – a record producer and artist originally from Kampala, Uganda and now based in Berlin. I built this AI tool to break creative boundaries and help fellow artists overcome writer’s block. My journey in music has always been about blending tradition with innovation, and this platform is a testament to that passion. Whether you’re here to craft the next hit lyric or discover fresh beats, I’m excited to share my world with you.
              </p>
              <p className="text-md text-gray-300 italic max-w-2xl mx-auto">
-                "I created this tool because I know the struggle of facing a blank page. With AI on our side, creativity flows easier and faster, letting us focus on the art and emotion behind every lyric."
+                &quot;I created this tool because I know the struggle of facing a blank page. With AI on our side, creativity flows easier and faster, letting us focus on the art and emotion behind every lyric.&quot;
              </p>
              <p className="text-lg font-semibold text-white mt-6 mb-2">A Place In Time Entertainment</p>
              <p className="text-md text-gray-300 italic">
-                "Crafting timeless creativity from this moment to eternity, leaving a boundless impact on culture."
+                &quot;Crafting timeless creativity from this moment to eternity, leaving a boundless impact on culture.&quot;
              </p>
              <p className="text-sm text-gray-400 mt-4">
                 Founded by Bryan Alvin Bagorogoza, APIT is a home for creatives, with a future vision extending into film and beyond.
