@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import SpotifyArtistInfo from '@/components/SpotifyArtistInfo';
-import SpotifyTopSongs from '@/components/SpotifyTopSongs'; // Import the top songs component
+// Removed import for SpotifyTopSongs as we use iframe now
 
 // --- Agent Data (Updated) ---
 interface Agent { id: string; name: string; description: string; }
@@ -19,11 +19,35 @@ const availableAgents: Agent[] = [
 ];
 // --- End Agent Data ---
 
+// Interface for the expected Analysis API response structure
+interface AnalysisResultData {
+  syllablesPerLine?: number[];
+  rhymeSchemeAnalysis?: string;
+  rhymeDetails?: { words: string[]; type: string }[];
+  rhythmAndPacing?: string;
+  repetitionTechniques?: string[];
+  overallComplexity?: string;
+  melodySuggestion?: string;
+  keyObservations?: string[];
+  formattedLyrics?: string;
+  parseError?: string;
+  rawResponse?: string;
+}
+
+// Interface for Genius Search results
+interface GeniusHit {
+    id: number;
+    title: string;
+    artist: string;
+    url: string;
+    thumbnailUrl?: string;
+}
+
 export default function Home() {
   // --- State Variables ---
   const [lyricsInput, setLyricsInput] = useState(''); // For analysis input (middle panel)
   const [ideaInput, setIdeaInput] = useState(''); // For generation input (left panel)
-  const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResultData | null>(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
 
@@ -38,6 +62,13 @@ export default function Home() {
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0.1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioControlsRef = useRef<HTMLDivElement | null>(null);
+
+  // State for Genius Search
+  const [geniusQuery, setGeniusQuery] = useState('');
+  const [geniusResults, setGeniusResults] = useState<GeniusHit[]>([]); // Use interface
+  const [geniusLoading, setGeniusLoading] = useState(false);
+  const [geniusError, setGeniusError] = useState<string | null>(null);
 
   // --- Handler Functions ---
   const handleAgentSelection = (agentId: string) => {
@@ -100,6 +131,31 @@ export default function Home() {
 
   const toggleMute = () => { if (audioRef.current) { const newMutedState = !audioRef.current.muted; audioRef.current.muted = newMutedState; setIsMuted(newMutedState); } };
   const handleVolumeChange = (event: React.ChangeEvent<HTMLInputElement>) => { const newVolume = parseFloat(event.target.value); setVolume(newVolume); };
+
+  const pauseBackgroundAudio = () => { if (audioRef.current && !audioRef.current.paused) { console.log("Pausing background audio due to potential Spotify interaction."); audioRef.current.pause(); } };
+
+  // --- Genius Search Handler ---
+  async function handleGeniusSearch(e?: React.FormEvent<HTMLFormElement>) {
+    if (e) e.preventDefault(); // Prevent form submission if used in a form
+    if (!geniusQuery.trim()) return;
+
+    setGeniusLoading(true);
+    setGeniusError(null);
+    setGeniusResults([]);
+    try {
+      const response = await fetch(`/api/genius/search?q=${encodeURIComponent(geniusQuery)}`);
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to fetch Genius results');
+      }
+      setGeniusResults(data.hits || []);
+    } catch (error) {
+      console.error("Genius search fetch error:", error);
+      setGeniusError(error instanceof Error ? error.message : "Failed to search Genius.");
+    } finally {
+      setGeniusLoading(false);
+    }
+  }
   // --- End Handler Functions & Audio ---
 
   return (
@@ -127,22 +183,18 @@ export default function Home() {
               {/* --- Left Panel: Generator --- */}
               <div className="flex flex-col gap-5 min-h-[70vh]">
                 <h3 className="text-xl font-semibold text-white border-b border-white/20 pb-2">AI Generator</h3>
-                 {/* Idea Input */}
                  <div className="flex flex-col gap-2">
                    <label htmlFor="idea-input" className="text-sm font-medium text-gray-300">Your Idea / Prompt:</label>
                    <textarea id="idea-input" placeholder="Enter song concept, theme, or starting lines..." className="w-full p-3 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 resize-none transition-colors duration-200 min-h-[100px]" value={ideaInput} onChange={(e) => setIdeaInput(e.target.value)} disabled={generationLoading} />
                  </div>
-                 {/* Generation Parameter Controls */}
                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                    <div className="flex flex-col gap-1"> <label htmlFor="genre-select" className="text-sm font-medium text-gray-300">Genre:</label> <select id="genre-select" className="p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 disabled:opacity-60 transition-colors duration-200" disabled={generationLoading} value={selectedGenre} onChange={(e) => setSelectedGenre(e.target.value)}> <option value="">Any</option> <option value="trap">Trap</option> <option value="boom-bap">Boom Bap</option> <option value="rnb">R&B</option> <option value="pop-rap">Pop Rap</option> <option value="conscious">Conscious</option> <option value="drill">Drill</option> <option value="lo-fi">Lo-fi</option> </select> </div>
                    <div className="flex flex-col gap-1"> <label htmlFor="era-select" className="text-sm font-medium text-gray-300">Era:</label> <select id="era-select" className="p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 disabled:opacity-60 transition-colors duration-200" disabled={generationLoading} value={selectedEra} onChange={(e) => setSelectedEra(e.target.value)}> <option value="">Any</option> <option value="80s">80s</option> <option value="90s">90s</option> <option value="2000s">2000s</option> <option value="2010s">2010s</option> <option value="modern">Modern</option> </select> </div>
                    <div className="flex flex-col gap-1 sm:col-span-2"> <label htmlFor="mood-input" className="text-sm font-medium text-gray-300">Mood:</label> <input id="mood-input" type="text" placeholder="e.g., nostalgic, energetic" className="p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 disabled:opacity-60 transition-colors duration-200" value={moodInput} onChange={(e) => setMoodInput(e.target.value)} disabled={generationLoading} /> </div>
                  </div>
-                {/* Generate Button */}
                 <button className="mt-3 px-5 py-2 rounded bg-white/10 hover:bg-white/20 border border-white/30 text-white font-medium transition-colors duration-200 self-center disabled:opacity-50 disabled:cursor-not-allowed" onClick={handleGenerateOrFinish} disabled={generationLoading || !ideaInput}>
                   {generationLoading ? 'Generating...' : 'Generate Lyrics'}
                 </button>
-                 {/* Generated Lyrics Area */}
                  <div className="p-4 rounded bg-black/30 border border-white/10 flex-grow overflow-y-auto mt-3 min-h-[200px]">
                     {generationLoading && <p className="text-sm text-gray-400">Generating...</p>}
                     {generationError && <p className="text-sm text-red-400">Error: {generationError}</p>}
@@ -223,7 +275,13 @@ export default function Home() {
 
         {/* --- Music Section (Combined Artist + Top Songs) --- */}
          <section className="w-full max-w-6xl my-16 sm:my-24 backdrop-blur-sm bg-black/30 p-6 sm:p-8 rounded-lg border border-white/10">
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
+             {/* Add event listeners to the container */}
+             <div
+                className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start"
+                onClick={pauseBackgroundAudio} // Pause on click within this section
+                onFocus={pauseBackgroundAudio} // Pause if user tabs into the iframe
+                tabIndex={-1} // Make div focusable programmatically if needed
+             >
                  {/* My Artist Info Column */}
                  <div className="flex flex-col items-center">
                      <h3 className="text-2xl font-bold mb-4 text-white">My Music</h3>
@@ -235,7 +293,15 @@ export default function Home() {
                  <div className="flex flex-col items-center">
                       <h3 className="text-2xl font-bold mb-4 text-white">Top Global Songs</h3>
                       <p className="text-sm text-gray-300 mb-6 text-center">Current hits on Spotify.</p>
-                      <SpotifyTopSongs />
+                      {/* Replace component with iframe embed */}
+                      <iframe
+                        style={{ borderRadius: '12px', border: 'none', width: '100%', maxWidth: '400px', height: '352px' }} // Added border:none, max-width
+                        src="https://open.spotify.com/embed/playlist/37i9dQZEVXbMDoHDwVN2tF?utm_source=generator&theme=0" // Using theme=0 for dark
+                        allowFullScreen={false} // Security best practice unless fullscreen is needed
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                        loading="lazy"
+                        title="Spotify Top 50 Global Playlist"
+                      ></iframe>
                  </div>
              </div>
         </section>
@@ -279,7 +345,7 @@ export default function Home() {
       </main>
 
       {/* Audio Controls */}
-      <div className="fixed bottom-5 right-5 z-50 flex items-center gap-3 p-2 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 shadow-lg">
+      <div ref={audioControlsRef} className="fixed bottom-5 right-5 z-50 flex items-center gap-3 p-2 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 shadow-lg">
         <button onClick={toggleMute} className="p-1 rounded-full hover:bg-white/20 transition-colors" aria-label={isMuted ? "Unmute background audio" : "Mute background audio"}>
           {isMuted ? ( <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-white"><path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l-2.25 2.25M15 9.75 14.25 12l.75 2.25m-4.5 0L7.5 12l-.75-2.25M3 10.055 3 9.75a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 .75.75v.305m-3 0V12a6 6 0 0 0 6 6m-6 0a6 6 0 0 1 6-6m-6 0H4.5m6 6H6.375m6.375 0L10.5 18.75m0 0L11.25 12l1.25-2.25" /><path strokeLinecap="round" strokeLinejoin="round" d="m3 3 18 18" /></svg> )
           : ( <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-white"><path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" /></svg> )}
