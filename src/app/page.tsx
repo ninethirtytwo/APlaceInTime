@@ -52,21 +52,24 @@ export default function Home() {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResultData | null>(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [annotationsInput, setAnnotationsInput] = useState(''); // State for annotations
 
   const [generatedLyrics, setGeneratedLyrics] = useState<string | null>(null);
   const [generationLoading, setGenerationLoading] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
+  const [storylineInput, setStorylineInput] = useState(''); // State for storyline
 
   const [selectedAgents, setSelectedAgents] = useState<string[]>(['lead']);
   const [selectedGenre, setSelectedGenre] = useState('');
   const [selectedEra, setSelectedEra] = useState('');
-  const [moodInput, setMoodInput] = useState('');
+  const [selectedMood, setSelectedMood] = useState(''); // Changed from moodInput
+
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0.1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioControlsRef = useRef<HTMLDivElement | null>(null);
 
-  // State for Genius Search (Commented out as unused for now)
+  // State for Genius Search (Commented out as unused)
   /*
   const [geniusQuery, setGeniusQuery] = useState('');
   const [geniusResults, setGeniusResults] = useState<GeniusHit[]>([]);
@@ -75,12 +78,10 @@ export default function Home() {
   */
 
   // State for Musixmatch Lyrics Search
-  const [musixmatchTrack, setMusixmatchTrack] = useState(''); // Track to search for (can be set automatically later)
-  const [musixmatchArtist, setMusixmatchArtist] = useState(''); // Artist to search for (can be set automatically later)
   const [musixmatchLyrics, setMusixmatchLyrics] = useState<string | null>(null);
   const [musixmatchLoading, setMusixmatchLoading] = useState(false);
   const [musixmatchError, setMusixmatchError] = useState<string | null>(null);
-  const [lyricsSearchQuery, setLyricsSearchQuery] = useState(''); // State for the lyrics search input
+  const [lyricsSearchQuery, setLyricsSearchQuery] = useState('');
 
   // --- Handler Functions ---
   const handleAgentSelection = (agentId: string) => {
@@ -92,9 +93,15 @@ export default function Home() {
   async function handleAnalyzeFlow() {
     setAnalysisLoading(true); setAnalysisError(null); setAnalysisResult(null);
     const lyricsToAnalyze = lyricsInput;
+    const annotations = annotationsInput; // Get annotations
     if (!lyricsToAnalyze) { setAnalysisError("No lyrics provided to analyze."); setAnalysisLoading(false); return; }
     try {
-      const response = await fetch('/api/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lyrics: lyricsToAnalyze }), });
+      const response = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          // Send annotations along with lyrics
+          body: JSON.stringify({ lyrics: lyricsToAnalyze, annotations: annotations }),
+      });
       const data = await response.json();
       if (!response.ok) { throw new Error(data.error || `HTTP error! status: ${response.status}`); }
       if (data.parseError) { console.error("Backend JSON parsing error:", data.parseError); setAnalysisError(`Analysis failed: ${data.parseError}`); setAnalysisResult({ rawResponse: data.rawResponse }); }
@@ -106,9 +113,23 @@ export default function Home() {
   async function handleGenerateOrFinish() {
     setGenerationLoading(true); setGenerationError(null);
     const promptInput = ideaInput || "Write a song based on the selected parameters.";
+    const storyline = storylineInput; // Get storyline
     const contextLyrics = null;
     try {
-      const response = await fetch('/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: promptInput, context: contextLyrics, agents: selectedAgents, genre: selectedGenre, era: selectedEra, mood: moodInput, analysis: analysisResult }), });
+      const response = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+              prompt: promptInput,
+              context: contextLyrics,
+              agents: selectedAgents,
+              genre: selectedGenre,
+              era: selectedEra,
+              mood: selectedMood, // Use selectedMood state
+              storyline: storyline, // Pass storyline
+              analysis: analysisResult
+          }),
+      });
       const data = await response.json();
       if (!response.ok) { throw new Error(data.error || `HTTP error! status: ${response.status}`); }
       setGeneratedLyrics(data.generatedLyrics);
@@ -146,7 +167,7 @@ export default function Home() {
 
   const pauseBackgroundAudio = () => { if (audioRef.current && !audioRef.current.paused) { console.log("Pausing background audio due to potential Spotify interaction."); audioRef.current.pause(); } };
 
-  // --- Genius Search Handler (Commented out as unused for now) ---
+  // --- Genius Search Handler (Commented out as unused) ---
   /*
   async function handleGeniusSearch(e?: React.FormEvent<HTMLFormElement>) {
     // ... implementation ...
@@ -201,24 +222,107 @@ export default function Home() {
               <h2 className="text-3xl font-bold mb-2 text-white">AI Lyric Generator & Analyzer</h2>
               <p className="text-md text-gray-300">Write, analyze, and perfect your lyrics with AI.</p>
            </div>
-           {/* 2-Column Grid Layout (Generator+Options | Analyzer+Lyrics) */}
-           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 backdrop-blur-lg bg-black/40 p-6 sm:p-8 rounded-xl shadow-2xl border border-white/10">
+           {/* Restoring 3-Column Grid Layout */}
+           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 backdrop-blur-lg bg-black/40 p-6 sm:p-8 rounded-xl shadow-2xl border border-white/10">
               {/* --- Left Panel: Generator --- */}
-              {/* --- Left Panel: Generator + Options --- */}
-              <div className="flex flex-col gap-5 "> {/* Removed min-h */}
+              <div className="flex flex-col gap-4 min-h-[70vh]"> {/* Adjusted gap */}
                 <h3 className="text-xl font-semibold text-white border-b border-white/20 pb-2">AI Generator</h3>
                  <div className="flex flex-col gap-2">
                    <label htmlFor="idea-input" className="text-sm font-medium text-gray-300">Your Idea / Prompt:</label>
                    <textarea id="idea-input" placeholder="Enter song concept, theme, or starting lines..." className="w-full p-3 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 resize-none transition-colors duration-200 min-h-[100px]" value={ideaInput} onChange={(e) => setIdeaInput(e.target.value)} disabled={generationLoading} />
                  </div>
+                 {/* Generation Parameter Controls */}
                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                   <div className="flex flex-col gap-1"> <label htmlFor="genre-select" className="text-sm font-medium text-gray-300">Genre:</label> <select id="genre-select" className="p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 disabled:opacity-60 transition-colors duration-200" disabled={generationLoading} value={selectedGenre} onChange={(e) => setSelectedGenre(e.target.value)}> <option value="">Any</option> <option value="trap">Trap</option> <option value="boom-bap">Boom Bap</option> <option value="rnb">R&B</option> <option value="pop-rap">Pop Rap</option> <option value="conscious">Conscious</option> <option value="drill">Drill</option> <option value="lo-fi">Lo-fi</option> </select> </div>
-                   <div className="flex flex-col gap-1"> <label htmlFor="era-select" className="text-sm font-medium text-gray-300">Era:</label> <select id="era-select" className="p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 disabled:opacity-60 transition-colors duration-200" disabled={generationLoading} value={selectedEra} onChange={(e) => setSelectedEra(e.target.value)}> <option value="">Any</option> <option value="80s">80s</option> <option value="90s">90s</option> <option value="2000s">2000s</option> <option value="2010s">2010s</option> <option value="modern">Modern</option> </select> </div>
-                   <div className="flex flex-col gap-1 sm:col-span-2"> <label htmlFor="mood-input" className="text-sm font-medium text-gray-300">Mood:</label> <input id="mood-input" type="text" placeholder="e.g., nostalgic, energetic" className="p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 disabled:opacity-60 transition-colors duration-200" value={moodInput} onChange={(e) => setMoodInput(e.target.value)} disabled={generationLoading} /> </div>
+                   {/* Genre Select */}
+                   <div className="flex flex-col gap-1">
+                      <label htmlFor="genre-select" className="text-sm font-medium text-gray-300">Genre:</label>
+                      <select id="genre-select" className="p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 disabled:opacity-60 transition-colors duration-200" disabled={generationLoading} value={selectedGenre} onChange={(e) => setSelectedGenre(e.target.value)}>
+                        <option value="">Any</option>
+                        <option value="hip-hop">Hip Hop (General)</option>
+                        <option value="trap">Trap</option>
+                        <option value="boom-bap">Boom Bap</option>
+                        <option value="rnb">R&B</option>
+                        <option value="pop">Pop</option>
+                        <option value="pop-rap">Pop Rap</option>
+                        <option value="conscious-hip-hop">Conscious Hip Hop</option>
+                        <option value="drill">Drill</option>
+                        <option value="lo-fi-hip-hop">Lo-fi Hip Hop</option>
+                        <option value="alternative-rap">Alternative Rap</option>
+                        <option value="emo-rap">Emo Rap</option>
+                        <option value="hyperpop">Hyperpop</option>
+                        <option value="country-rap">Country Rap</option>
+                        <option value="jazz-rap">Jazz Rap</option>
+                        <option value="g-funk">G-Funk</option>
+                        <option value="soul">Soul</option>
+                        <option value="funk">Funk</option>
+                        <option value="reggae">Reggae</option>
+                        <option value="dancehall">Dancehall</option>
+                        <option value="rock">Rock Rap</option>
+                        <option value="latin-trap">Latin Trap</option>
+                        <option value="afrobeat">Afrobeat</option>
+                        <option value="dancehall">Dancehall</option>
+                        <option value="afropop">Afropop</option>
+                        <option value="afro-house">Afro House</option>
+                        {/* Added Genres */}
+                      </select>
+                   </div>
+                   {/* Era Select */}
+                   <div className="flex flex-col gap-1">
+                      <label htmlFor="era-select" className="text-sm font-medium text-gray-300">Era:</label>
+                      <select id="era-select" className="p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 disabled:opacity-60 transition-colors duration-200" disabled={generationLoading} value={selectedEra} onChange={(e) => setSelectedEra(e.target.value)}>
+                        <option value="">Any</option>
+                        <option value="1920s">1920s</option>
+                        <option value="1930s">1930s</option>
+                        <option value="1940s">1940s</option>
+                        <option value="1950s">1950s</option>
+                        <option value="1960s">1960s</option>
+                        <option value="1970s">1970s</option>
+                        <option value="1980s">1980s</option>
+                        <option value="1990s">1990s</option>
+                        <option value="2000s">2000s</option>
+                        <option value="2010s">2010s</option>
+                        <option value="2020s">2020s</option>
+                        <option value="future">Futuristic</option>
+                        {/* Added Eras */}
+                      </select>
+                   </div>
+                   {/* Mood Select */}
+                   <div className="flex flex-col gap-1 sm:col-span-2">
+                      <label htmlFor="mood-select" className="text-sm font-medium text-gray-300">Mood:</label>
+                      <select id="mood-select" className="p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 disabled:opacity-60 transition-colors duration-200" disabled={generationLoading} value={selectedMood} onChange={(e) => setSelectedMood(e.target.value)}>
+                         <option value="">Any</option>
+                         <option value="happy">Happy</option>
+                         <option value="sad">Sad</option>
+                         <option value="angry">Angry</option>
+                         <option value="reflective">Reflective</option>
+                         <option value="energetic">Energetic</option>
+                         <option value="chill">Chill</option>
+                         <option value="romantic">Romantic</option>
+                         <option value="dark">Dark</option>
+                         <option value="hype">Hype</option>
+                         <option value="nostalgic">Nostalgic</option>
+                         <option value="hopeful">Hopeful</option>
+                         <option value="aggressive">Aggressive</option>
+                         <option value="playful">Playful</option>
+                         <option value="serious">Serious</option>
+                         {/* Added Moods */}
+                      </select>
+                   </div>
                  </div>
-                <button className="mt-3 px-5 py-2 rounded bg-white/10 hover:bg-white/20 border border-white/30 text-white font-medium transition-colors duration-200 self-center disabled:opacity-50 disabled:cursor-not-allowed" onClick={handleGenerateOrFinish} disabled={generationLoading || !ideaInput}>
-                  {generationLoading ? 'Generating...' : 'Generate Lyrics'}
-                </button>
+                 {/* Storyline Input */}
+                 <div className="flex flex-col gap-2">
+                   <label htmlFor="storyline-input" className="text-sm font-medium text-gray-300">Storyline / Narrative (Optional):</label>
+                   <textarea id="storyline-input" placeholder="Describe the story or message..." className="w-full p-3 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 resize-none transition-colors duration-200 min-h-[80px]" value={storylineInput} onChange={(e) => setStorylineInput(e.target.value)} disabled={generationLoading} />
+                 </div>
+                 {/* Generate Button */}
+                 <button className="mt-4 px-5 py-2 rounded bg-white/10 hover:bg-white/20 border border-white/30 text-white font-medium transition-colors duration-200 self-center disabled:opacity-50 disabled:cursor-not-allowed" onClick={handleGenerateOrFinish} disabled={generationLoading || !ideaInput}>
+                   {generationLoading ? 'Generating...' : 'Generate Lyrics'}
+                 </button>
+                 {/* Display Selected Agents */}
+                 <div className="text-center text-xs text-gray-400 mt-2">
+                    Writing Team: {selectedAgents.map(id => availableAgents.find(a => a.id === id)?.name || id).join(', ')}
+                 </div>
+                 {/* Generated Lyrics Area */}
                  <div className="p-4 rounded bg-black/30 border border-white/10 flex-grow overflow-y-auto mt-3 min-h-[200px]">
                     {generationLoading && <p className="text-sm text-gray-400">Generating...</p>}
                     {generationError && <p className="text-sm text-red-400">Error: {generationError}</p>}
@@ -230,14 +334,21 @@ export default function Home() {
               {/* --- Middle Panel: Analyzer --- */}
               <div className="flex flex-col gap-5 min-h-[70vh]">
                  <h3 className="text-xl font-semibold text-white border-b border-white/20 pb-2">Lyric Analyzer</h3>
+                 {/* Annotations Input */}
+                 <div className="flex flex-col gap-2">
+                   <label htmlFor="annotations-input" className="text-sm font-medium text-gray-300">Annotations / Background Info (Optional):</label>
+                   <textarea id="annotations-input" placeholder="Add context like Genius annotations..." className="w-full p-3 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 resize-none transition-colors duration-200 min-h-[80px]" value={annotationsInput} onChange={(e) => setAnnotationsInput(e.target.value)} disabled={analysisLoading} />
+                 </div>
+                 {/* Lyric Input */}
                  <div className="flex flex-col gap-2 flex-grow">
                    <label htmlFor="analyze-input" className="text-sm font-medium text-gray-300">Lyrics to Analyze:</label>
-                   <textarea id="analyze-input" placeholder="Paste lyrics here for analysis..." className="w-full flex-grow p-3 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 resize-none transition-colors duration-200 min-h-[200px]" value={lyricsInput} onChange={(e) => setLyricsInput(e.target.value)} disabled={analysisLoading} />
+                   <textarea id="analyze-input" placeholder="Paste lyrics here for analysis..." className="w-full flex-grow p-3 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 resize-none transition-colors duration-200 min-h-[150px]" value={lyricsInput} onChange={(e) => setLyricsInput(e.target.value)} disabled={analysisLoading} /> {/* Adjusted min-h */}
                  </div>
                  <button className="mt-1 px-5 py-2 rounded bg-white/10 hover:bg-white/20 border border-white/30 text-white font-medium transition-colors duration-200 self-center disabled:opacity-50 disabled:cursor-not-allowed" onClick={handleAnalyzeFlow} disabled={analysisLoading || !lyricsInput}>
                    {analysisLoading ? 'Analyzing...' : 'Analyze Flow'}
                  </button>
-                 <div className="p-4 rounded bg-black/40 border border-white/10 flex-grow overflow-y-auto text-sm space-y-3 mt-3 min-h-[200px]">
+                 {/* Analysis Results Area */}
+                 <div className="p-4 rounded bg-black/40 border border-white/10 flex-grow overflow-y-auto text-sm space-y-3 mt-3 min-h-[150px]"> {/* Adjusted min-h */}
                     {analysisLoading && <p className="text-gray-400">Analyzing...</p>}
                     {analysisError && <p className="text-red-400">Error: {analysisError}</p>}
                     {analysisResult && !analysisLoading && !analysisError && (
@@ -257,55 +368,32 @@ export default function Home() {
                     )}
                     {!analysisResult && !analysisLoading && !analysisError && ( <p className="text-sm text-gray-500 italic">(Analysis results will appear here...)</p> )}
                  </div>
-
-                 {/* --- Genius/Musixmatch Search --- */}
+                 {/* Musixmatch Search UI */}
                  <div className="mt-6 pt-4 border-t border-white/10">
                     <h4 className="text-md font-semibold mb-3 text-gray-200">Find Lyrics (via Musixmatch)</h4>
-                    {/* We'll reuse the geniusQuery state for the input for now */}
-                    {/* Use a form for potential Enter key submission, call Musixmatch handler */}
                     <form onSubmit={(e) => {
-                        e.preventDefault(); // Prevent default form submission
-                        // Basic parsing attempt: Assumes "Title - Artist" format
-                        const parts = lyricsSearchQuery.split('-').map((p: string) => p.trim()); // Use lyricsSearchQuery and type 'p'
+                        e.preventDefault();
+                        const parts = lyricsSearchQuery.split('-').map((p: string) => p.trim());
                         const track = parts[0];
                         const artist = parts.length > 1 ? parts.slice(1).join(' ') : '';
-                        if (track && artist) {
-                            handleMusixmatchSearch(track, artist);
-                        } else {
-                            setMusixmatchError("Please enter in 'Title - Artist' format.");
-                        }
+                        if (track && artist) { handleMusixmatchSearch(track, artist); }
+                        else { setMusixmatchError("Please enter in 'Title - Artist' format."); }
                     }} className="flex gap-2 items-center">
-                        <input
-                            type="text"
-                            placeholder="Enter Song Title - Artist"
-                            value={lyricsSearchQuery}
-                            onChange={(e) => setLyricsSearchQuery(e.target.value)}
-                            className="flex-grow p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100"
-                            disabled={musixmatchLoading} // Use musixmatch loading state
-                        />
-                        {/* Button type is submit by default within a form */}
-                        <button
-                            className="px-4 py-2 rounded bg-purple-600/80 hover:bg-purple-500/80 text-white text-sm font-medium transition-colors duration-200 disabled:opacity-50"
-                            disabled={musixmatchLoading || !lyricsSearchQuery} // Disable based on musixmatch loading and lyrics search query
-                        >
+                        <input type="text" placeholder="Enter Song Title - Artist" value={lyricsSearchQuery} onChange={(e) => setLyricsSearchQuery(e.target.value)} className="flex-grow p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100" disabled={musixmatchLoading} />
+                        <button className="px-4 py-2 rounded bg-purple-600/80 hover:bg-purple-500/80 text-white text-sm font-medium transition-colors duration-200 disabled:opacity-50" disabled={musixmatchLoading || !lyricsSearchQuery}>
                             {musixmatchLoading ? 'Searching...' : 'Search'}
                         </button>
                     </form>
-                    {/* Musixmatch Results Area */}
                     <div className="mt-4 p-3 rounded bg-black/30 border border-white/10 min-h-[100px] max-h-[300px] overflow-y-auto text-xs">
                         {musixmatchLoading && <p className="text-gray-400 italic">Loading lyrics...</p>}
                         {musixmatchError && <p className="text-red-400">Error: {musixmatchError}</p>}
-                        {musixmatchLyrics && !musixmatchLoading && !musixmatchError && (
-                            <pre className="whitespace-pre-wrap text-gray-200">{musixmatchLyrics}</pre>
-                        )}
-                        {!musixmatchLyrics && !musixmatchLoading && !musixmatchError && (
-                            <p className="text-gray-500 italic">(Lyrics will appear here if found...)</p>
-                        )}
+                        {musixmatchLyrics && !musixmatchLoading && !musixmatchError && ( <pre className="whitespace-pre-wrap text-gray-200">{musixmatchLyrics}</pre> )}
+                        {!musixmatchLyrics && !musixmatchLoading && !musixmatchError && ( <p className="text-gray-500 italic">(Lyrics will appear here if found...)</p> )}
                     </div>
                  </div>
               </div>
 
-              {/* --- Right Panel: AI Writing Team --- */}
+              {/* --- Right Panel: AI Writing Team (Checkboxes Restored) --- */}
               <div className="flex flex-col gap-5 min-h-[70vh]">
                 <h3 className="text-xl font-semibold text-white border-b border-white/20 pb-2">AI Writing Team</h3>
                 <div className="space-y-3 flex-grow overflow-y-auto pr-2">
@@ -322,6 +410,14 @@ export default function Home() {
               </div>
 
             </div> {/* End of 3-column grid */}
+        </section>
+
+        {/* --- Graphs/Trends Placeholder Section --- */}
+        <section className="w-full max-w-6xl my-16 sm:my-24 text-center">
+             <h2 className="text-3xl font-bold mb-4 text-white">Lyric Trends & Insights</h2>
+             <div className="p-6 rounded-lg border border-dashed border-gray-600 backdrop-blur-sm bg-black/30">
+                 <p className="text-gray-400 italic">(Graphs and trend data visualizations coming soon...)</p>
+             </div>
         </section>
 
         {/* --- Features Section --- */}
@@ -345,37 +441,41 @@ export default function Home() {
 
         {/* --- Music Section (Combined Artist + Top Songs) --- */}
          <section className="w-full max-w-6xl my-16 sm:my-24 backdrop-blur-sm bg-black/30 p-6 sm:p-8 rounded-lg border border-white/10">
-             {/* Add event listeners to the container */}
+             {/* Placeholder for Graphs/Trends */}
+             <div className="text-center mb-8">
+                 <h3 className="text-2xl font-bold mb-4 text-white">Music Trends & Insights</h3>
+                 <p className="text-gray-400 italic">(Graphs and trend data coming soon...)</p>
+             </div>
+             {/* Spotify Embeds */}
              <div
                 className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start"
-                onClick={pauseBackgroundAudio} // Pause on click within this section
-                onFocus={pauseBackgroundAudio} // Pause if user tabs into the iframe
-                tabIndex={-1} // Make div focusable programmatically if needed
+                onClick={pauseBackgroundAudio}
+                onFocus={pauseBackgroundAudio}
+                tabIndex={-1}
              >
                  {/* My Artist Info Column */}
                  <div className="flex flex-col items-center">
                      <h3 className="text-2xl font-bold mb-4 text-white">My Music</h3>
                      <p className="text-sm text-gray-300 mb-6 text-center">Experience my beats and tracks.</p>
-                     {/* Replace component with Artist Embed iframe */}
+                     {/* Artist Embed iframe */}
                      <iframe
-                        style={{ borderRadius: '12px', border: 'none', width: '100%', maxWidth: '400px', height: '352px' }} // Added border:none, max-width
-                        src="https://open.spotify.com/embed/artist/3i7KKztiuNxSgo146aHLIZ?utm_source=generator&theme=0" // Using theme=0 for dark
+                        style={{ borderRadius: '12px', border: 'none', width: '100%', maxWidth: '400px', height: '352px' }}
+                        src="https://open.spotify.com/embed/artist/3i7KKztiuNxSgo146aHLIZ?utm_source=generator&theme=0"
                         allowFullScreen={false}
                         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                         loading="lazy"
                         title="Spotify Artist Embed - BryAlvin XII"
                       ></iframe>
-                     {/* Analyze button removed for now */}
                  </div>
                  {/* Top Songs Column */}
                  <div className="flex flex-col items-center">
                       <h3 className="text-2xl font-bold mb-4 text-white">Top Global Songs</h3>
                       <p className="text-sm text-gray-300 mb-6 text-center">Current hits on Spotify.</p>
-                      {/* Replace component with iframe embed */}
+                      {/* Top 50 Playlist iframe embed */}
                       <iframe
-                        style={{ borderRadius: '12px', border: 'none', width: '100%', maxWidth: '400px', height: '352px' }} // Added border:none, max-width
-                        src="https://open.spotify.com/embed/playlist/37i9dQZEVXbMDoHDwVN2tF?utm_source=generator&theme=0" // Using theme=0 for dark
-                        allowFullScreen={false} // Security best practice unless fullscreen is needed
+                        style={{ borderRadius: '12px', border: 'none', width: '100%', maxWidth: '400px', height: '352px' }}
+                        src="https://open.spotify.com/embed/playlist/37i9dQZEVXbMDoHDwVN2tF?utm_source=generator&theme=0"
+                        allowFullScreen={false}
                         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                         loading="lazy"
                         title="Spotify Top 50 Global Playlist"
@@ -405,11 +505,11 @@ export default function Home() {
                 Hey, I’m <span className="font-semibold">BryAlvin XII</span> – a record producer and artist originally from Kampala, Uganda and now based in Berlin. I built this AI tool to break creative boundaries and help fellow artists overcome writer’s block. My journey in music has always been about blending tradition with innovation, and this platform is a testament to that passion. Whether you’re here to craft the next hit lyric or discover fresh beats, I’m excited to share my world with you.
              </p>
              <p className="text-md text-gray-300 italic max-w-2xl mx-auto">
-                &quot;I created this tool because I know the struggle of facing a blank page. With AI on our side, creativity flows easier and faster, letting us focus on the art and emotion behind every lyric.&quot;
+                "I created this tool because I know the struggle of facing a blank page. With AI on our side, creativity flows easier and faster, letting us focus on the art and emotion behind every lyric."
              </p>
              <p className="text-lg font-semibold text-white mt-6 mb-2">A Place In Time Entertainment</p>
              <p className="text-md text-gray-300 italic">
-                &quot;Crafting timeless creativity from this moment to eternity, leaving a boundless impact on culture.&quot;
+                "Crafting timeless creativity from this moment to eternity, leaving a boundless impact on culture."
              </p>
              <p className="text-sm text-gray-400 mt-4">
                 Founded by Bryan Alvin Bagorogoza, APIT is a home for creatives, with a future vision extending into film and beyond.
