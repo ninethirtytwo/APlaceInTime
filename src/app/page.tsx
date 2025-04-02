@@ -201,10 +201,11 @@ export default function Home() {
               <h2 className="text-3xl font-bold mb-2 text-white">AI Lyric Generator & Analyzer</h2>
               <p className="text-md text-gray-300">Write, analyze, and perfect your lyrics with AI.</p>
            </div>
-           {/* 3-Column Grid Layout for Tools */}
-           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 backdrop-blur-lg bg-black/40 p-6 sm:p-8 rounded-xl shadow-2xl border border-white/10">
+           {/* 2-Column Grid Layout (Generator+Options | Analyzer+Lyrics) */}
+           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 backdrop-blur-lg bg-black/40 p-6 sm:p-8 rounded-xl shadow-2xl border border-white/10">
               {/* --- Left Panel: Generator --- */}
-              <div className="flex flex-col gap-5 min-h-[70vh]">
+              {/* --- Left Panel: Generator + Options --- */}
+              <div className="flex flex-col gap-5 "> {/* Removed min-h */}
                 <h3 className="text-xl font-semibold text-white border-b border-white/20 pb-2">AI Generator</h3>
                  <div className="flex flex-col gap-2">
                    <label htmlFor="idea-input" className="text-sm font-medium text-gray-300">Your Idea / Prompt:</label>
