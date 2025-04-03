@@ -13,6 +13,14 @@
   --font-mono: var(--font-geist-mono);
 }
 
+body {
+  background-image: url('/bonfireblack.jpeg'); /* Or another image from /public */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed; /* Keep background fixed during scroll */
+  background-repeat: no-repeat;
+}
+
 /* Removed @media query for dark mode preference to force dark theme */
 
 body {

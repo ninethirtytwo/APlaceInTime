@@ -67,7 +67,7 @@ export default function Home() {
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0.1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const audioControlsRef = useRef<HTMLDivElement | null>(null);
+  const audioControlsRef = useRef<HTMLDivElement | null>(null); // Ref for the audio controls container
 
   // State for Genius Search (Commented out as unused)
   /*
@@ -82,6 +82,7 @@ export default function Home() {
   const [musixmatchLoading, setMusixmatchLoading] = useState(false);
   const [musixmatchError, setMusixmatchError] = useState<string | null>(null);
   const [lyricsSearchQuery, setLyricsSearchQuery] = useState('');
+  const [isAboutExpanded, setIsAboutExpanded] = useState(false); // State for About Me collapse
 
   // --- Handler Functions ---
   const handleAgentSelection = (agentId: string) => {
@@ -99,7 +100,6 @@ export default function Home() {
       const response = await fetch('/api/analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          // Send annotations along with lyrics
           body: JSON.stringify({ lyrics: lyricsToAnalyze, annotations: annotations }),
       });
       const data = await response.json();
@@ -125,8 +125,8 @@ export default function Home() {
               agents: selectedAgents,
               genre: selectedGenre,
               era: selectedEra,
-              mood: selectedMood, // Use selectedMood state
-              storyline: storyline, // Pass storyline
+              mood: selectedMood,
+              storyline: storyline,
               analysis: analysisResult
           }),
       });
@@ -488,9 +488,18 @@ export default function Home() {
                     </div>
                 ))}
              </div>
-             <p className="text-md text-gray-200 mb-4 max-w-2xl mx-auto">
-                Hey, I’m <span className="font-semibold">BryAlvin XII</span> – a record producer and artist originally from Kampala, Uganda and now based in Berlin. I built this AI tool to break creative boundaries and help fellow artists overcome writer’s block. My journey in music has always been about blending tradition with innovation, and this platform is a testament to that passion. Whether you’re here to craft the next hit lyric or discover fresh beats, I’m excited to share my world with you.
-             </p>
+             {/* Collapsible Bio */}
+             <div className="text-md text-gray-200 mb-4 max-w-2xl mx-auto text-left sm:text-center">
+                <p className={`transition-all duration-300 ease-in-out overflow-hidden ${isAboutExpanded ? 'max-h-full' : 'max-h-12 sm:max-h-6'}`}>
+                    Hey, I’m <span className="font-semibold">BryAlvin XII</span> – a record producer and artist originally from Kampala, Uganda and now based in Berlin. I built this AI tool to break creative boundaries and help fellow artists overcome writer’s block. My journey in music has always been about blending tradition with innovation, and this platform is a testament to that passion. Whether you’re here to craft the next hit lyric or discover fresh beats, I’m excited to share my world with you.
+                </p>
+                <button
+                    onClick={() => setIsAboutExpanded(!isAboutExpanded)}
+                    className="text-blue-400 hover:text-blue-300 text-sm mt-1"
+                >
+                    {isAboutExpanded ? 'Read Less' : 'Read More...'}
+                </button>
+             </div>
              <p className="text-md text-gray-300 italic max-w-2xl mx-auto">
                 "I created this tool because I know the struggle of facing a blank page. With AI on our side, creativity flows easier and faster, letting us focus on the art and emotion behind every lyric."
              </p>
@@ -509,7 +518,28 @@ export default function Home() {
         </footer>
       </main>
 
-      {/* Audio Controls */}
+      {/* Floating Controls Container - Top Left for Chatbot */}
+       <div className="fixed top-5 left-5 z-50 flex flex-col gap-4">
+         {/* Chatbot Placeholder Button */}
+         <button
+           title="Chat with Vinn Assistant (Coming Soon)" // Updated tooltip text
+           className="p-2 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 text-white shadow-lg hover:bg-black/70 transition-all duration-200 cursor-not-allowed opacity-80 flex items-center gap-2" // Changed background, added border
+           disabled // Disable for now
+         >
+            {/* Avatar Image */}
+            <Image
+              src="/vinn.png"
+              alt="Vinn Avatar"
+              width={32} // Adjust size as needed
+              height={32}
+              className="rounded-full"
+            />
+            {/* Optional: Add text like "Chat" */}
+            {/* <span className="text-xs font-medium">Chat</span> */}
+         </button>
+       </div>
+
+      {/* Audio Controls (Separate Container, Bottom Right) */}
       <div ref={audioControlsRef} className="fixed bottom-5 right-5 z-50 flex items-center gap-3 p-2 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 shadow-lg">
         <button onClick={toggleMute} className="p-1 rounded-full hover:bg-white/20 transition-colors" aria-label={isMuted ? "Unmute background audio" : "Mute background audio"}>
           {isMuted ? ( <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-white"><path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l-2.25 2.25M15 9.75 14.25 12l.75 2.25m-4.5 0L7.5 12l-.75-2.25M3 10.055 3 9.75a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 .75.75v.305m-3 0V12a6 6 0 0 0 6 6m-6 0a6 6 0 0 1 6-6m-6 0H4.5m6 6H6.375m6.375 0L10.5 18.75m0 0L11.25 12l1.25-2.25" /><path strokeLinecap="round" strokeLinejoin="round" d="m3 3 18 18" /></svg> )

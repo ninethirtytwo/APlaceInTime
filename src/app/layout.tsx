@@ -25,9 +25,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased relative`} // Added relative positioning
       >
-        {children}
+        {/* Background Video Removed */}
+        {/* Ensure children are rendered above the video */}
+        {children} {/* Render children directly */}
       </body>
     </html>
   );
