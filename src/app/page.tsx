@@ -8,7 +8,7 @@ import { TypeAnimation } from 'react-type-animation'; // Import TypeAnimation
 // Removed import for SpotifyTopSongs as we use iframe now
 
 // --- Agent Data (Updated) ---
-interface Agent { id: string; name: string; description: string; }
+interface Agent { id: string; name: string; description: string; } // Removed avatar for now
 const availableAgents: Agent[] = [
     { id: 'lead', name: 'Lead Writer', description: 'Supervises and integrates styles.' },
     { id: 'poet', name: 'Literary Poet', description: 'Metaphors, wordplay, imagery.' },
@@ -393,7 +393,7 @@ export default function Home() {
                         {analysisResult.keyObservations && analysisResult.keyObservations.length > 0 && ( <div><h5 className="font-semibold text-gray-300 mb-1">Key Observations:</h5><ul className="list-disc list-inside text-gray-200 pl-2">{analysisResult.keyObservations.map((obs: string, index: number) => <li key={index}>{obs}</li>)}</ul></div> )}
                         {analysisResult.formattedLyrics && ( <div className="mt-4"><h5 className="font-semibold text-gray-300 mb-1">Formatted Lyrics (for Flow):</h5><pre className="text-amber-200 whitespace-pre-wrap text-xs bg-black/20 p-2 rounded">{analysisResult.formattedLyrics}</pre></div> )}
                         {/* Placeholder for AI-provided annotations */}
-                        {analysisResult && <div className="mt-4 pt-2 border-t border-white/10"><h5 className="font-semibold text-gray-300 mb-1">Vinn's Background Info:</h5><p className="text-gray-400 italic text-xs">(Analysis annotations coming soon...)</p></div>}
+                        {analysisResult && !analysisResult.parseError && <div className="mt-4 pt-2 border-t border-white/10"><h5 className="font-semibold text-gray-300 mb-1">Vinn's Background Info:</h5><p className="text-gray-400 italic text-xs">(AI-provided annotations will appear here if available...)</p></div>}
                         {/* Fallback JSON.stringify removed to avoid lint errors */}
                       </>
                     )}
@@ -552,11 +552,11 @@ export default function Home() {
                 </button>
              </div>
              <p className="text-md text-gray-300 italic max-w-2xl mx-auto">
-                &quot;I created this tool because I know the struggle of facing a blank page. With AI on our side, creativity flows easier and faster, letting us focus on the art and emotion behind every lyric.&quot;
+                "I created this tool because I know the struggle of facing a blank page. With AI on our side, creativity flows easier and faster, letting us focus on the art and emotion behind every lyric."
              </p>
              <p className="text-lg font-semibold text-white mt-6 mb-2">A Place In Time Entertainment</p>
              <p className="text-md text-gray-300 italic">
-                &quot;Crafting timeless creativity from this moment to eternity, leaving a boundless impact on culture.&quot;
+                "Crafting timeless creativity from this moment to eternity, leaving a boundless impact on culture."
              </p>
              <p className="text-sm text-gray-400 mt-4">
                 Founded by Bryan Alvin Bagorogoza, APIT is a home for creatives, with a future vision extending into film and beyond.
