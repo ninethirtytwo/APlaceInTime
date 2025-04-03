@@ -32,6 +32,8 @@ interface AnalysisResultData {
   formattedLyrics?: string;
   parseError?: string;
   rawResponse?: string;
+  // Placeholder for future AI annotations
+  aiAnnotations?: string;
 }
 
 // Interface for Genius Search results (Commented out as unused)
@@ -52,7 +54,7 @@ export default function Home() {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResultData | null>(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
-  const [annotationsInput, setAnnotationsInput] = useState(''); // State for annotations
+  // Removed annotationsInput state
 
   const [generatedLyrics, setGeneratedLyrics] = useState<string | null>(null);
   const [generationLoading, setGenerationLoading] = useState(false);
@@ -77,11 +79,11 @@ export default function Home() {
   const [geniusError, setGeniusError] = useState<string | null>(null);
   */
 
-  // State for Musixmatch Lyrics Search
+  // State for Lyrics Search (Restored, relabeled conceptually as "Ask Vinn")
   const [musixmatchLyrics, setMusixmatchLyrics] = useState<string | null>(null);
   const [musixmatchLoading, setMusixmatchLoading] = useState(false);
   const [musixmatchError, setMusixmatchError] = useState<string | null>(null);
-  const [lyricsSearchQuery, setLyricsSearchQuery] = useState('');
+  const [lyricsSearchQuery, setLyricsSearchQuery] = useState(''); // State for the lyrics search input
   const [isAboutExpanded, setIsAboutExpanded] = useState(false); // State for About Me collapse
 
   // --- Handler Functions ---
@@ -94,13 +96,14 @@ export default function Home() {
   async function handleAnalyzeFlow() {
     setAnalysisLoading(true); setAnalysisError(null); setAnalysisResult(null);
     const lyricsToAnalyze = lyricsInput;
-    const annotations = annotationsInput; // Get annotations
+    // Removed annotations input from here
     if (!lyricsToAnalyze) { setAnalysisError("No lyrics provided to analyze."); setAnalysisLoading(false); return; }
     try {
       const response = await fetch('/api/analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ lyrics: lyricsToAnalyze, annotations: annotations }),
+          // Removed annotations from body
+          body: JSON.stringify({ lyrics: lyricsToAnalyze }),
       });
       const data = await response.json();
       if (!response.ok) { throw new Error(data.error || `HTTP error! status: ${response.status}`); }
@@ -173,20 +176,21 @@ export default function Home() {
     // ... implementation ...
   }
   */
-  // --- Musixmatch Lyrics Search Handler ---
-  async function handleMusixmatchSearch(track: string, artist: string) {
+  // --- Lyrics Search Handler (Restored - conceptually "Ask Vinn") ---
+  async function handleLyricsSearch(track: string, artist: string) {
     if (!track || !artist) {
-      setMusixmatchError("Track and Artist names are needed to search lyrics.");
+      setMusixmatchError("Track and Artist names are needed to search lyrics."); // Keep error state specific for now
       return;
     }
-    setMusixmatchLoading(true);
+    setMusixmatchLoading(true); // Keep loading state specific for now
     setMusixmatchError(null);
-    setMusixmatchLyrics(null);
+    setMusixmatchLyrics(null); // Keep lyrics state specific for now
     try {
+      // Still calls the Musixmatch route for now, until chatbot is implemented
       const response = await fetch(`/api/musixmatch/lyrics?track=${encodeURIComponent(track)}&artist=${encodeURIComponent(artist)}`);
       const data = await response.json();
       if (!response.ok || data.error) {
-        throw new Error(data.error || data.message || 'Failed to fetch lyrics from Musixmatch');
+        throw new Error(data.error || data.message || 'Failed to fetch lyrics');
       }
       if (data.lyrics) {
         setMusixmatchLyrics(data.lyrics);
@@ -194,8 +198,8 @@ export default function Home() {
         setMusixmatchError(data.message || "Lyrics not found.");
       }
     } catch (error) {
-      console.error("Musixmatch search fetch error:", error);
-      setMusixmatchError(error instanceof Error ? error.message : "Failed to search Musixmatch.");
+      console.error("Lyrics search fetch error:", error);
+      setMusixmatchError(error instanceof Error ? error.message : "Failed to search lyrics.");
     } finally {
       setMusixmatchLoading(false);
     }
@@ -333,11 +337,7 @@ export default function Home() {
               {/* --- Middle Panel: Analyzer --- */}
               <div className="flex flex-col gap-5 min-h-[70vh]">
                  <h3 className="text-xl font-semibold text-white border-b border-white/20 pb-2">Lyric Analyzer</h3>
-                 {/* Annotations Input */}
-                 <div className="flex flex-col gap-2">
-                   <label htmlFor="annotations-input" className="text-sm font-medium text-gray-300">Annotations / Background Info (Optional):</label>
-                   <textarea id="annotations-input" placeholder="Add context like Genius annotations..." className="w-full p-3 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 resize-none transition-colors duration-200 min-h-[80px]" value={annotationsInput} onChange={(e) => setAnnotationsInput(e.target.value)} disabled={analysisLoading} />
-                 </div>
+                 {/* Annotations Input Removed */}
                  {/* Lyric Input */}
                  <div className="flex flex-col gap-2 flex-grow">
                    <label htmlFor="analyze-input" className="text-sm font-medium text-gray-300">Lyrics to Analyze:</label>
@@ -362,20 +362,22 @@ export default function Home() {
                         {analysisResult.melodySuggestion && ( <div><h5 className="font-semibold text-gray-300 mb-1">Melody Suggestion:</h5><p className="text-gray-200 italic">{analysisResult.melodySuggestion}</p></div> )}
                         {analysisResult.keyObservations && analysisResult.keyObservations.length > 0 && ( <div><h5 className="font-semibold text-gray-300 mb-1">Key Observations:</h5><ul className="list-disc list-inside text-gray-200 pl-2">{analysisResult.keyObservations.map((obs: string, index: number) => <li key={index}>{obs}</li>)}</ul></div> )}
                         {analysisResult.formattedLyrics && ( <div className="mt-4"><h5 className="font-semibold text-gray-300 mb-1">Formatted Lyrics (for Flow):</h5><pre className="text-amber-200 whitespace-pre-wrap text-xs bg-black/20 p-2 rounded">{analysisResult.formattedLyrics}</pre></div> )}
+                        {/* Placeholder for AI-provided annotations */}
+                        {analysisResult && <div className="mt-4 pt-2 border-t border-white/10"><h5 className="font-semibold text-gray-300 mb-1">Vinn's Background Info:</h5><p className="text-gray-400 italic text-xs">(Analysis annotations coming soon...)</p></div>}
                         {!analysisResult.parseError && !analysisResult.syllablesPerLine && !analysisResult.rhymeDetails && !analysisResult.formattedLyrics && ( <pre className="text-gray-200 whitespace-pre-wrap text-xs">{JSON.stringify(analysisResult, null, 2)}</pre> )}
                       </>
                     )}
                     {!analysisResult && !analysisLoading && !analysisError && ( <p className="text-sm text-gray-500 italic">(Analysis results will appear here...)</p> )}
                  </div>
-                 {/* Musixmatch Search UI */}
+                 {/* Lyrics Search UI (Relabeled) */}
                  <div className="mt-6 pt-4 border-t border-white/10">
-                    <h4 className="text-md font-semibold mb-3 text-gray-200">Find Lyrics (via Musixmatch)</h4>
+                    <h4 className="text-md font-semibold mb-3 text-gray-200">Find Lyrics (Ask Vinn)</h4> {/* Relabeled */}
                     <form onSubmit={(e) => {
                         e.preventDefault();
                         const parts = lyricsSearchQuery.split('-').map((p: string) => p.trim());
                         const track = parts[0];
                         const artist = parts.length > 1 ? parts.slice(1).join(' ') : '';
-                        if (track && artist) { handleMusixmatchSearch(track, artist); }
+                        if (track && artist) { handleLyricsSearch(track, artist); } // Use renamed handler
                         else { setMusixmatchError("Please enter in 'Title - Artist' format."); }
                     }} className="flex gap-2 items-center">
                         <input type="text" placeholder="Enter Song Title - Artist" value={lyricsSearchQuery} onChange={(e) => setLyricsSearchQuery(e.target.value)} className="flex-grow p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100" disabled={musixmatchLoading} />
@@ -541,12 +543,13 @@ export default function Home() {
 
       {/* Audio Controls (Separate Container, Bottom Right) */}
       <div ref={audioControlsRef} className="fixed bottom-5 right-5 z-50 flex items-center gap-3 p-2 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 shadow-lg">
+        {/* Audio Controls Content (moved inside separate div) */}
         <button onClick={toggleMute} className="p-1 rounded-full hover:bg-white/20 transition-colors" aria-label={isMuted ? "Unmute background audio" : "Mute background audio"}>
           {isMuted ? ( <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-white"><path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l-2.25 2.25M15 9.75 14.25 12l.75 2.25m-4.5 0L7.5 12l-.75-2.25M3 10.055 3 9.75a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 .75.75v.305m-3 0V12a6 6 0 0 0 6 6m-6 0a6 6 0 0 1 6-6m-6 0H4.5m6 6H6.375m6.375 0L10.5 18.75m0 0L11.25 12l1.25-2.25" /><path strokeLinecap="round" strokeLinejoin="round" d="m3 3 18 18" /></svg> )
           : ( <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-white"><path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" /></svg> )}
         </button>
         <input type="range" min="0" max="1" step="0.01" value={volume} onChange={handleVolumeChange} className="w-20 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-blue-400" aria-label="Volume slider" />
-      </div>
+      </div> {/* Close outer audio controls container */}
     </> // Closing fragment tag
   );
-}
+} // Closing component function
