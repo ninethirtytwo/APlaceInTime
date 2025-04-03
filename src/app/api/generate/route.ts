@@ -24,7 +24,8 @@ function buildAgentPrompt(
     era: string,
     mood: string,
     contextLyrics?: string | null,
-    analysisContext?: AnalysisContext | null // Use the interface, allow null
+    analysisContext?: AnalysisContext | null, // Use the interface, allow null
+    storyline?: string | null // Add storyline parameter
 ): string {
   let prompt = `You are an expert songwriting assistant collaborating with a user, acting as a specific AI writing team member or a lead integrating multiple perspectives. `;
 
@@ -68,13 +69,20 @@ function buildAgentPrompt(
     // Add more analysis fields if needed
   }
 
-  // Add Context Lyrics if provided
-  if (contextLyrics) {
-    prompt += `\n\nUse the following existing lyrics as context or inspiration:\n---\n${contextLyrics}\n---\n`;
-  }
-
   // Define the Core Task
-  prompt += `\n\nYour task is to generate compelling and creative song lyrics (verses and chorus minimum) based on the user's idea/request below. Adhere strictly to the selected agent roles, genre/era/mood parameters, and any provided analysis context/style. If context lyrics are provided, either continue them seamlessly or write new lyrics inspired by them and the analysis.`;
+  prompt += `\n\nYour task is to generate compelling and creative song lyrics based on the user's idea/request below. Adhere strictly to the selected agent roles, genre/era/mood parameters, and any provided analysis context/style.`;
+  if (storyline) {
+    prompt += ` The lyrics should follow this narrative or storyline: ${storyline}.`;
+  }
+  if (contextLyrics) {
+    prompt += ` Use the following existing lyrics as context or inspiration:\n---\n${contextLyrics}\n---\n`;
+    prompt += ` Either continue them seamlessly or write new lyrics inspired by them and the analysis.`;
+  } else {
+     prompt += ` Generate complete lyrics including verses and a chorus minimum.`;
+  }
+  // Request structure labels
+  prompt += ` Clearly label the different sections of the song using bracketed tags like [Verse 1], [Chorus], [Bridge], [Hook], [Pre-Hook], [Outro], etc. where appropriate.`;
+
   prompt += `\n\nUser Idea/Request: "${idea}"`;
 
   // Explicitly request the desired formatting
@@ -86,7 +94,7 @@ function buildAgentPrompt(
 
 export async function POST(request: Request) {
   try {
-    const { prompt: idea, context, agents, genre, era, mood, analysis } = await request.json();
+    const { prompt: idea, context, agents, genre, era, mood, storyline, analysis } = await request.json(); // Add storyline
 
     // Basic validation
     if (!idea || typeof idea !== 'string') {
@@ -100,7 +108,7 @@ export async function POST(request: Request) {
     const model = "claude-3-opus-20240229"; // Or claude-3-sonnet...
 
     // Build the dynamic prompt using the helper function
-    const finalPrompt = buildAgentPrompt(idea, agents, genre || '', era || '', mood || '', context, analysis);
+    const finalPrompt = buildAgentPrompt(idea, agents, genre || '', era || '', mood || '', context, analysis, storyline); // Pass storyline
 
     console.log(`Sending final prompt to Claude (length: ${finalPrompt.length}): ${finalPrompt.substring(0, 300)}...`); // Log beginning of prompt
 

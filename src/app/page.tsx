@@ -238,32 +238,31 @@ export default function Home() {
                       <label htmlFor="genre-select" className="text-sm font-medium text-gray-300">Genre:</label>
                       <select id="genre-select" className="p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 disabled:opacity-60 transition-colors duration-200" disabled={generationLoading} value={selectedGenre} onChange={(e) => setSelectedGenre(e.target.value)}>
                         <option value="">Any</option>
-                        <option value="hip-hop">Hip Hop (General)</option>
-                        <option value="trap">Trap</option>
+                        <option value="afrobeat">Afrobeat</option>
+                        <option value="afro-house">Afro House</option>
+                        <option value="afropop">Afropop</option>
+                        <option value="alternative-rap">Alternative Rap</option>
                         <option value="boom-bap">Boom Bap</option>
-                        <option value="rnb">R&B</option>
+                        <option value="conscious-hip-hop">Conscious Hip Hop</option>
+                        <option value="country-rap">Country Rap</option>
+                        <option value="dancehall">Dancehall</option>
+                        <option value="drill">Drill</option>
+                        <option value="emo-rap">Emo Rap</option>
+                        <option value="funk">Funk</option>
+                        <option value="g-funk">G-Funk</option>
+                        <option value="hip-hop">Hip Hop (General)</option>
+                        <option value="hyperpop">Hyperpop</option>
+                        <option value="jazz-rap">Jazz Rap</option>
+                        <option value="latin-trap">Latin Trap</option>
+                        <option value="lo-fi-hip-hop">Lo-fi Hip Hop</option>
                         <option value="pop">Pop</option>
                         <option value="pop-rap">Pop Rap</option>
-                        <option value="conscious-hip-hop">Conscious Hip Hop</option>
-                        <option value="drill">Drill</option>
-                        <option value="lo-fi-hip-hop">Lo-fi Hip Hop</option>
-                        <option value="alternative-rap">Alternative Rap</option>
-                        <option value="emo-rap">Emo Rap</option>
-                        <option value="hyperpop">Hyperpop</option>
-                        <option value="country-rap">Country Rap</option>
-                        <option value="jazz-rap">Jazz Rap</option>
-                        <option value="g-funk">G-Funk</option>
-                        <option value="soul">Soul</option>
-                        <option value="funk">Funk</option>
+                        <option value="rnb">R&B</option>
                         <option value="reggae">Reggae</option>
-                        <option value="dancehall">Dancehall</option>
                         <option value="rock">Rock Rap</option>
-                        <option value="latin-trap">Latin Trap</option>
-                        <option value="afrobeat">Afrobeat</option>
-                        <option value="dancehall">Dancehall</option>
-                        <option value="afropop">Afropop</option>
-                        <option value="afro-house">Afro House</option>
-                        {/* Added Genres */}
+                        <option value="soul">Soul</option>
+                        <option value="trap">Trap</option>
+                        {/* Sorted & Added Genres */}
                       </select>
                    </div>
                    {/* Era Select */}
@@ -291,21 +290,21 @@ export default function Home() {
                       <label htmlFor="mood-select" className="text-sm font-medium text-gray-300">Mood:</label>
                       <select id="mood-select" className="p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 disabled:opacity-60 transition-colors duration-200" disabled={generationLoading} value={selectedMood} onChange={(e) => setSelectedMood(e.target.value)}>
                          <option value="">Any</option>
-                         <option value="happy">Happy</option>
-                         <option value="sad">Sad</option>
+                         <option value="aggressive">Aggressive</option>
                          <option value="angry">Angry</option>
-                         <option value="reflective">Reflective</option>
-                         <option value="energetic">Energetic</option>
                          <option value="chill">Chill</option>
-                         <option value="romantic">Romantic</option>
                          <option value="dark">Dark</option>
+                         <option value="energetic">Energetic</option>
+                         <option value="happy">Happy</option>
+                         <option value="hopeful">Hopeful</option>
                          <option value="hype">Hype</option>
                          <option value="nostalgic">Nostalgic</option>
-                         <option value="hopeful">Hopeful</option>
-                         <option value="aggressive">Aggressive</option>
                          <option value="playful">Playful</option>
+                         <option value="reflective">Reflective</option>
+                         <option value="romantic">Romantic</option>
+                         <option value="sad">Sad</option>
                          <option value="serious">Serious</option>
-                         {/* Added Moods */}
+                         {/* Sorted Moods */}
                       </select>
                    </div>
                  </div>
@@ -412,14 +411,6 @@ export default function Home() {
             </div> {/* End of 3-column grid */}
         </section>
 
-        {/* --- Graphs/Trends Placeholder Section --- */}
-        <section className="w-full max-w-6xl my-16 sm:my-24 text-center">
-             <h2 className="text-3xl font-bold mb-4 text-white">Lyric Trends & Insights</h2>
-             <div className="p-6 rounded-lg border border-dashed border-gray-600 backdrop-blur-sm bg-black/30">
-                 <p className="text-gray-400 italic">(Graphs and trend data visualizations coming soon...)</p>
-             </div>
-        </section>
-
         {/* --- Features Section --- */}
         <section className="w-full max-w-4xl text-center my-16 sm:my-24">
             <h2 className="text-3xl font-bold mb-6 text-white">Key Features</h2>
@@ -441,11 +432,7 @@ export default function Home() {
 
         {/* --- Music Section (Combined Artist + Top Songs) --- */}
          <section className="w-full max-w-6xl my-16 sm:my-24 backdrop-blur-sm bg-black/30 p-6 sm:p-8 rounded-lg border border-white/10">
-             {/* Placeholder for Graphs/Trends */}
-             <div className="text-center mb-8">
-                 <h3 className="text-2xl font-bold mb-4 text-white">Music Trends & Insights</h3>
-                 <p className="text-gray-400 italic">(Graphs and trend data coming soon...)</p>
-             </div>
+             {/* Graphs/Trends Placeholder Section Removed */}
              {/* Spotify Embeds */}
              <div
                 className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start"

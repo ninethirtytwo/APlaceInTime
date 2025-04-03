@@ -22,7 +22,7 @@ interface AnalysisResponse {
 
 export async function POST(request: Request) {
   try {
-    const { lyrics } = await request.json();
+    const { lyrics, annotations } = await request.json(); // Extract annotations
 
     if (!lyrics || typeof lyrics !== 'string') {
       return NextResponse.json({ error: 'Lyrics are required and must be a string.' }, { status: 400 });
@@ -43,6 +43,7 @@ export async function POST(request: Request) {
 - "keyObservations": Array of other key observations about flow or delivery (string[]).
 - "formattedLyrics": The original input lyrics reformatted with line breaks indicating natural pauses or melodic phrases, using '\\n' for newlines (string).
 
+${annotations ? `\n\nAnnotations/Background Context Provided by User:\n---\n${annotations}\n---\n` : ''}
 Lyrics to Analyze:
 ---
 ${lyrics}
