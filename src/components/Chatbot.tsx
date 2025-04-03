@@ -15,31 +15,65 @@ interface Message {
   text: string;
 }
 
+// Define message structure for API history
+interface ApiChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+
 const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
-  // Placeholder state for messages and input
   const [messages, setMessages] = React.useState<Message[]>([
     { sender: 'vinn', text: "Hey! I'm Vinn, your AI creative partner. How can I help you today?" }
   ]);
   const [input, setInput] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
+  const messagesEndRef = React.useRef<null | HTMLDivElement>(null); // Ref for scrolling
 
   const handleSend = async () => {
     if (!input.trim()) return;
 
     const userMessage: Message = { sender: 'user', text: input };
-    setMessages(prev => [...prev, userMessage]);
+    // Add user message immediately for responsiveness
+    const currentMessages = [...messages, userMessage];
+    setMessages(currentMessages);
     setInput('');
     setIsLoading(true);
 
-    // --- TODO: Backend API Call ---
-    // Replace with actual API call to a new /api/chat route
-    // Send input and potentially message history
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API delay
-    const botResponse: Message = { sender: 'vinn', text: `Okay, working on: "${userMessage.text}" (Chat functionality coming soon!)` };
-    // --- End TODO ---
+    // --- Backend API Call ---
+    try {
+      // Prepare history in the format Claude expects ('user'/'assistant')
+      // Exclude the initial greeting message from history sent to API if desired
+      const historyPayload: ApiChatMessage[] = currentMessages
+        .slice(1) // Optionally remove the first greeting message
+        .map(msg => ({
+            role: msg.sender === 'user' ? 'user' : 'assistant',
+            content: msg.text
+        }));
 
-    setMessages(prev => [...prev, botResponse]);
-    setIsLoading(false);
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage.text, history: historyPayload }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.error) {
+        throw new Error(data.error || 'Failed to get response from Vinn.');
+      }
+
+      const botResponse: Message = { sender: 'vinn', text: data.reply || "Sorry, I couldn't think of anything." };
+      setMessages(prev => [...prev, botResponse]);
+
+    } catch (error) {
+       console.error("Chat API error:", error);
+       const errorResponse: Message = { sender: 'vinn', text: error instanceof Error ? error.message : "Sorry, something went wrong." };
+       setMessages(prev => [...prev, errorResponse]);
+    } finally {
+        setIsLoading(false);
+    }
+    // --- End Backend API Call ---
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -48,6 +82,11 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
       handleSend();
     }
   };
+
+  // Scroll to bottom when messages change
+  React.useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   return (
     <AnimatePresence>
@@ -58,7 +97,6 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
           exit={{ opacity: 0, y: 50, scale: 0.9 }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           className="fixed bottom-5 right-5 sm:bottom-auto sm:top-20 sm:left-5 z-50 w-[90vw] max-w-md h-[70vh] sm:h-[60vh] bg-black/70 backdrop-blur-lg rounded-xl shadow-2xl border border-white/10 flex flex-col overflow-hidden"
-          // Position changes based on screen size: bottom-right on small, top-left on larger
         >
           {/* Header */}
           <div className="flex items-center justify-between p-3 border-b border-white/10 bg-black/30 flex-shrink-0">
@@ -74,7 +112,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
           </div>
 
           {/* Message List */}
-          <div className="flex-grow p-4 overflow-y-auto space-y-4">
+          <div className="flex-grow p-4 overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"> {/* Added scrollbar styling */}
             {messages.map((msg, index) => (
               <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] p-3 rounded-lg text-sm ${
@@ -94,7 +132,9 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
                  </div>
                </div>
             )}
-          </div>
+             {/* Empty div to scroll to */}
+             <div ref={messagesEndRef} />
+          </div> {/* Close Message List div */}
 
           {/* Input Area */}
           <div className="p-3 border-t border-white/10 bg-black/30 flex-shrink-0">
@@ -123,6 +163,6 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
       )}
     </AnimatePresence>
   );
-};
+}; // Closing component function
 
 export default Chatbot;
