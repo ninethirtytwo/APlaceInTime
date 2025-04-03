@@ -8,16 +8,17 @@ import { TypeAnimation } from 'react-type-animation'; // Import TypeAnimation
 // Removed import for SpotifyTopSongs as we use iframe now
 
 // --- Agent Data (Updated) ---
-interface Agent { id: string; name: string; description: string; } // Removed avatar for now
+interface Agent { id: string; name: string; description: string; avatar: string; } // Re-add avatar property
 const availableAgents: Agent[] = [
-    { id: 'lead', name: 'Lead Writer', description: 'Supervises and integrates styles.' },
-    { id: 'poet', name: 'Literary Poet', description: 'Metaphors, wordplay, imagery.' },
-    { id: 'mood', name: 'Mood Writer', description: 'Captures specific emotions.' },
-    { id: 'pop', name: 'Pop Culture Writer', description: 'Current trends, slang, references.' },
-    { id: 'analogy', name: 'Analogy Ace', description: 'Analogies, sayings, idioms.' },
-    { id: 'philosophy', name: 'Deep Thinker', description: 'Philosophy, psychology, depth.' },
-    { id: 'eras', name: 'Eras Writer', description: 'Writes in styles of specific eras.' },
-    { id: 'genre', name: 'Genre Specialist', description: 'Adheres to genre conventions.' },
+    // Add placeholder avatar paths - replace with actual paths in /public/avatars/ later
+    { id: 'lead', name: 'Ava Clarke – The Mastermind', description: 'Supervises and integrates styles.', avatar: '/avatars/lead.png' },
+    { id: 'poet', name: 'Elias Fontaine – The Wordsmith', description: 'Metaphors, wordplay, imagery.', avatar: '/avatars/poet.png' },
+    { id: 'mood', name: 'Luna Rivers – The Emotional Visionary', description: 'Captures specific emotions.', avatar: '/avatars/mood.png' },
+    { id: 'pop', name: 'Jay Carter – The Trendsetter', description: 'Current trends, slang, references.', avatar: '/avatars/pop.png' },
+    { id: 'analogy', name: 'Max "Sly" Dawson – The Metaphor King', description: 'Analogies, sayings, idioms.', avatar: '/avatars/analogy.png' },
+    { id: 'philosophy', name: 'Zane Mercer – The Philosopher', description: 'Philosophy, psychology, depth.', avatar: '/avatars/philosophy.png' },
+    { id: 'eras', name: 'Nova Sinclair – The Time Traveler', description: 'Writes in styles of specific eras.', avatar: '/avatars/eras.png' },
+    { id: 'genre', name: 'Rico Vega – The Shape-Shifter', description: 'Adheres to genre conventions.', avatar: '/avatars/genre.png' },
 ];
 // --- End Agent Data ---
 
@@ -36,6 +37,7 @@ interface AnalysisResultData {
   rawResponse?: string;
   // Placeholder for future AI annotations
   aiAnnotations?: string;
+  emotionAnalysis?: string; // Add field for emotion analysis
 }
 
 // Interface for Genius Search results (Commented out as unused)
@@ -390,6 +392,7 @@ export default function Home() {
                         {analysisResult.repetitionTechniques && analysisResult.repetitionTechniques.length > 0 && ( <div><h5 className="font-semibold text-gray-300 mb-1">Repetition Techniques:</h5><ul className="list-disc list-inside text-gray-200 pl-2">{analysisResult.repetitionTechniques.map((tech: string, index: number) => <li key={index}>{tech}</li>)}</ul></div> )}
                         {analysisResult.overallComplexity && ( <div><h5 className="font-semibold text-gray-300 mb-1">Overall Complexity:</h5><p className="text-gray-200">{analysisResult.overallComplexity}</p></div> )}
                         {analysisResult.melodySuggestion && ( <div><h5 className="font-semibold text-gray-300 mb-1">Melody Suggestion:</h5><p className="text-gray-200 italic">{analysisResult.melodySuggestion}</p></div> )}
+                        {analysisResult.emotionAnalysis && ( <div><h5 className="font-semibold text-gray-300 mb-1">Emotion Analysis:</h5><p className="text-gray-200">{analysisResult.emotionAnalysis}</p></div> )} {/* Display Emotion Analysis */}
                         {analysisResult.keyObservations && analysisResult.keyObservations.length > 0 && ( <div><h5 className="font-semibold text-gray-300 mb-1">Key Observations:</h5><ul className="list-disc list-inside text-gray-200 pl-2">{analysisResult.keyObservations.map((obs: string, index: number) => <li key={index}>{obs}</li>)}</ul></div> )}
                         {analysisResult.formattedLyrics && ( <div className="mt-4"><h5 className="font-semibold text-gray-300 mb-1">Formatted Lyrics (for Flow):</h5><pre className="text-amber-200 whitespace-pre-wrap text-xs bg-black/20 p-2 rounded">{analysisResult.formattedLyrics}</pre></div> )}
                         {/* Placeholder for AI-provided annotations */}
@@ -433,8 +436,10 @@ export default function Home() {
                 <h3 className="text-xl font-semibold text-white border-b border-white/20 pb-2">AI Writing Team</h3>
                 <div className="space-y-3 flex-grow overflow-y-auto pr-2">
                     {availableAgents.map(agent => (
-                        <div key={agent.id} className="flex items-start gap-3 p-2 rounded hover:bg-white/10 transition-colors duration-150">
-                           <input type="checkbox" id={`agent-${agent.id}`} checked={selectedAgents.includes(agent.id)} onChange={() => handleAgentSelection(agent.id)} className="mt-1 accent-blue-400 h-4 w-4 flex-shrink-0" disabled={generationLoading} />
+                        <div key={agent.id} className="flex items-center gap-3 p-2 rounded hover:bg-white/10 transition-colors duration-150"> {/* Use items-center */}
+                           <input type="checkbox" id={`agent-${agent.id}`} checked={selectedAgents.includes(agent.id)} onChange={() => handleAgentSelection(agent.id)} className="accent-blue-400 h-4 w-4 flex-shrink-0" disabled={generationLoading} />
+                           {/* Agent Avatar */}
+                           <Image src={agent.avatar} alt={`${agent.name} Avatar`} width={24} height={24} className="rounded-full flex-shrink-0" />
                            <label htmlFor={`agent-${agent.id}`} className="flex flex-col cursor-pointer">
                               <span className="font-medium text-sm text-gray-100">{agent.name}</span>
                               <span className="text-xs text-gray-400">{agent.description}</span>

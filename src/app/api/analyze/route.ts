@@ -42,6 +42,7 @@ export async function POST(request: Request) {
 - "melodySuggestion": A brief suggestion for a potential melodic approach based on the rhythm and structure (string).
 - "keyObservations": Array of other key observations about flow or delivery (string[]).
 - "formattedLyrics": The original input lyrics reformatted with line breaks indicating natural pauses or melodic phrases, using '\\n' for newlines (string).
+- "emotionAnalysis": A brief description of the dominant emotions conveyed by the lyrics (string).
 
 ${annotations ? `\n\nAnnotations/Background Context Provided by User:\n---\n${annotations}\n---\n` : ''}
 Lyrics to Analyze:
