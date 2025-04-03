@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion'; // Import motion
 import Image from 'next/image';
+import { TypeAnimation } from 'react-type-animation'; // Import TypeAnimation
 // Removed import for SpotifyArtistInfo as we use iframe now
 // Removed import for SpotifyTopSongs as we use iframe now
 
@@ -344,7 +345,17 @@ export default function Home() {
                  <div className="p-4 rounded bg-black/30 border border-white/10 flex-grow overflow-y-auto mt-3 min-h-[200px]">
                     {generationLoading && <p className="text-sm text-gray-400">Generating...</p>}
                     {generationError && <p className="text-sm text-red-400">Error: {generationError}</p>}
-                    {generatedLyrics && !generationLoading && !generationError && ( <pre className="text-sm text-gray-100 whitespace-pre-wrap">{generatedLyrics}</pre> )}
+                    {generatedLyrics && !generationLoading && !generationError && (
+                      <TypeAnimation
+                        sequence={[generatedLyrics]} // Pass the lyrics as the sequence
+                        // wrapper="pre" // Removed wrapper prop to resolve TS error, pre is often default
+                        speed={80} // Adjust typing speed (lower is faster)
+                        cursor={true}
+                        className="text-sm text-gray-100 whitespace-pre-wrap"
+                        // Optionally repeat, but likely not desired here
+                        // repeat={Infinity}
+                      />
+                    )}
                     {!generatedLyrics && !generationLoading && !generationError && ( <p className="text-sm text-gray-500 italic">(Generated lyrics/story will appear here...)</p> )}
                  </div>
               </div>

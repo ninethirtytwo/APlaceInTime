@@ -81,12 +81,12 @@ function buildAgentPrompt(
      prompt += ` Generate complete lyrics including verses and a chorus minimum.`;
   }
   // Request structure labels
-  prompt += ` Clearly label the different sections of the song using bracketed tags like [Verse 1], [Chorus], [Bridge], [Hook], [Pre-Hook], [Outro], etc. where appropriate.`;
+  prompt += ` Clearly label the different sections of the song using bracketed tags like [Verse 1], [Chorus], [Bridge], [Hook], [Pre-Hook], [Outro], etc. Place each label on its **own line** before the section begins.`; // Added emphasis on own line
 
   prompt += `\n\nUser Idea/Request: "${idea}"`;
 
   // Explicitly request the desired formatting
-  prompt += `\n\nIMPORTANT: Format the generated lyrics output with line breaks indicating natural pauses or melodic phrases, exactly like this example: "Iced out, I flex this\\nnew drop\\nFresh pack\\nwho's next up?". Use '\\n' to represent these line breaks within the final string output. Do not include any other explanatory text, just the formatted lyrics.`;
+  prompt += `\n\nIMPORTANT: Format the generated lyrics output carefully. Use '\\n' to represent line breaks. Each distinct lyrical line should start on a new line (using '\\n'). **Crucially, also use '\\n' within a lyrical line to indicate significant rhythmic pauses, breaths, or melodic phrases, similar to this flow example:** "Iced out, I flex this\\nnew drop\\nFresh pack\\nwho's next up?". Ensure structure labels like [Chorus] are also on their own lines. Do not include any other explanatory text, just the formatted lyrics.`; // Refined formatting instruction
 
   return prompt;
 }
