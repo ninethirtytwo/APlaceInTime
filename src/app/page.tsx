@@ -4,13 +4,14 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion'; // Import motion
 import Image from 'next/image';
 import { TypeAnimation } from 'react-type-animation'; // Import TypeAnimation
+import Chatbot from '@/components/Chatbot'; // Import Chatbot component
 // Removed import for SpotifyArtistInfo as we use iframe now
 // Removed import for SpotifyTopSongs as we use iframe now
 
 // --- Agent Data (Updated) ---
-interface Agent { id: string; name: string; description: string; avatar: string; } // Re-add avatar property
+// Add placeholder avatar paths - replace with actual paths in /public/avatars/ later
+interface Agent { id: string; name: string; description: string; avatar: string; }
 const availableAgents: Agent[] = [
-    // Add placeholder avatar paths - replace with actual paths in /public/avatars/ later
     { id: 'lead', name: 'Ava Clarke – The Mastermind', description: 'Supervises and integrates styles.', avatar: '/avatars/lead.png' },
     { id: 'poet', name: 'Elias Fontaine – The Wordsmith', description: 'Metaphors, wordplay, imagery.', avatar: '/avatars/poet.png' },
     { id: 'mood', name: 'Luna Rivers – The Emotional Visionary', description: 'Captures specific emotions.', avatar: '/avatars/mood.png' },
@@ -89,6 +90,7 @@ export default function Home() {
   const [musixmatchError, setMusixmatchError] = useState<string | null>(null);
   const [lyricsSearchQuery, setLyricsSearchQuery] = useState(''); // State for the lyrics search input
   const [isAboutExpanded, setIsAboutExpanded] = useState(false); // State for About Me collapse
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false); // State for chatbot visibility
 
   // --- Handler Functions ---
   const handleAgentSelection = (agentId: string) => {
@@ -436,10 +438,8 @@ export default function Home() {
                 <h3 className="text-xl font-semibold text-white border-b border-white/20 pb-2">AI Writing Team</h3>
                 <div className="space-y-3 flex-grow overflow-y-auto pr-2">
                     {availableAgents.map(agent => (
-                        <div key={agent.id} className="flex items-center gap-3 p-2 rounded hover:bg-white/10 transition-colors duration-150"> {/* Use items-center */}
-                           <input type="checkbox" id={`agent-${agent.id}`} checked={selectedAgents.includes(agent.id)} onChange={() => handleAgentSelection(agent.id)} className="accent-blue-400 h-4 w-4 flex-shrink-0" disabled={generationLoading} />
-                           {/* Agent Avatar */}
-                           <Image src={agent.avatar} alt={`${agent.name} Avatar`} width={24} height={24} className="rounded-full flex-shrink-0" />
+                        <div key={agent.id} className="flex items-start gap-3 p-2 rounded hover:bg-white/10 transition-colors duration-150">
+                           <input type="checkbox" id={`agent-${agent.id}`} checked={selectedAgents.includes(agent.id)} onChange={() => handleAgentSelection(agent.id)} className="mt-1 accent-blue-400 h-4 w-4 flex-shrink-0" disabled={generationLoading} />
                            <label htmlFor={`agent-${agent.id}`} className="flex flex-col cursor-pointer">
                               <span className="font-medium text-sm text-gray-100">{agent.name}</span>
                               <span className="text-xs text-gray-400">{agent.description}</span>
@@ -585,7 +585,7 @@ export default function Home() {
          <button
            title="Chat with Vinn Assistant (Coming Soon)" // Updated tooltip text
            className="p-2 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 text-white shadow-lg hover:bg-black/70 transition-all duration-200 cursor-not-allowed opacity-80 flex items-center gap-2" // Changed background, added border
-           disabled // Disable for now
+           onClick={() => setIsChatbotOpen(true)} // Open chatbot on click
          >
             {/* Avatar Image */}
             <Image
@@ -609,6 +609,9 @@ export default function Home() {
         </button>
         <input type="range" min="0" max="1" step="0.01" value={volume} onChange={handleVolumeChange} className="w-20 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-blue-400" aria-label="Volume slider" />
       </div> {/* Close outer audio controls container */}
+
+      {/* Render Chatbot */}
+      <Chatbot isOpen={isChatbotOpen} onClose={() => setIsChatbotOpen(false)} />
     </> // Closing fragment tag
   );
 } // Closing component function
