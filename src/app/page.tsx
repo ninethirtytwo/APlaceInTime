@@ -364,7 +364,7 @@ export default function Home() {
                         {analysisResult.formattedLyrics && ( <div className="mt-4"><h5 className="font-semibold text-gray-300 mb-1">Formatted Lyrics (for Flow):</h5><pre className="text-amber-200 whitespace-pre-wrap text-xs bg-black/20 p-2 rounded">{analysisResult.formattedLyrics}</pre></div> )}
                         {/* Placeholder for AI-provided annotations */}
                         {analysisResult && <div className="mt-4 pt-2 border-t border-white/10"><h5 className="font-semibold text-gray-300 mb-1">Vinn's Background Info:</h5><p className="text-gray-400 italic text-xs">(Analysis annotations coming soon...)</p></div>}
-                        {!analysisResult.parseError && !analysisResult.syllablesPerLine && !analysisResult.rhymeDetails && !analysisResult.formattedLyrics && ( <pre className="text-gray-200 whitespace-pre-wrap text-xs">{JSON.stringify(analysisResult, null, 2)}</pre> )}
+                        {!analysisResult.parseError && !analysisResult.syllablesPerLine && !analysisResult.rhymeDetails && !analysisResult.formattedLyrics && ( <pre className="text-gray-200 whitespace-pre-wrap text-xs">{JSON.stringify(analysisResult, null, 2).replace(/'/g, "&apos;")}</pre> )} {/* Escape apostrophes in JSON string */}
                       </>
                     )}
                     {!analysisResult && !analysisLoading && !analysisError && ( <p className="text-sm text-gray-500 italic">(Analysis results will appear here...)</p> )}
@@ -503,11 +503,11 @@ export default function Home() {
                 </button>
              </div>
              <p className="text-md text-gray-300 italic max-w-2xl mx-auto">
-                "I created this tool because I know the struggle of facing a blank page. With AI on our side, creativity flows easier and faster, letting us focus on the art and emotion behind every lyric."
+                &quot;I created this tool because I know the struggle of facing a blank page. With AI on our side, creativity flows easier and faster, letting us focus on the art and emotion behind every lyric.&quot;
              </p>
              <p className="text-lg font-semibold text-white mt-6 mb-2">A Place In Time Entertainment</p>
              <p className="text-md text-gray-300 italic">
-                "Crafting timeless creativity from this moment to eternity, leaving a boundless impact on culture."
+                &quot;Crafting timeless creativity from this moment to eternity, leaving a boundless impact on culture.&quot;
              </p>
              <p className="text-sm text-gray-400 mt-4">
                 Founded by Bryan Alvin Bagorogoza, APIT is a home for creatives, with a future vision extending into film and beyond.
