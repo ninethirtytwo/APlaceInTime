@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion'; // Import motion
 import Image from 'next/image';
 // Removed import for SpotifyArtistInfo as we use iframe now
 // Removed import for SpotifyTopSongs as we use iframe now
@@ -211,17 +212,27 @@ export default function Home() {
       <main className="relative flex min-h-screen flex-col items-center p-4 sm:p-8 text-white">
 
         {/* --- Header Section --- */}
-        <header className="w-full max-w-4xl text-center mb-10 sm:mb-12 mt-8 sm:mt-12">
+        <motion.header
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-4xl text-center mb-10 sm:mb-12 mt-8 sm:mt-12"
+        >
           <h1 className="text-4xl sm:text-5xl font-bold mb-2 text-white text-shadow-lg">
             A Place In Time Entertainment
           </h1>
           <p className="text-lg sm:text-xl text-gray-300 text-shadow">
             Home of Innovation in Music & AI
           </p>
-        </header>
+        </motion.header>
 
         {/* --- AI Tool Section --- */}
-        <section id="tool-section" className="w-full max-w-screen-lg xl:max-w-screen-xl mb-16 sm:mb-24">
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          id="tool-section" className="w-full max-w-screen-lg xl:max-w-screen-xl mb-16 sm:mb-24"
+        >
            <div className="text-center mb-8">
               <h2 className="text-3xl font-bold mb-2 text-white">AI Lyric Generator & Analyzer</h2>
               <p className="text-md text-gray-300">Write, analyze, and perfect your lyrics with AI.</p>
@@ -318,9 +329,13 @@ export default function Home() {
                    <textarea id="storyline-input" placeholder="Describe the story or message..." className="w-full p-3 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 resize-none transition-colors duration-200 min-h-[80px]" value={storylineInput} onChange={(e) => setStorylineInput(e.target.value)} disabled={generationLoading} />
                  </div>
                  {/* Generate Button */}
-                 <button className="mt-4 px-5 py-2 rounded bg-white/10 hover:bg-white/20 border border-white/30 text-white font-medium transition-colors duration-200 self-center disabled:opacity-50 disabled:cursor-not-allowed" onClick={handleGenerateOrFinish} disabled={generationLoading || !ideaInput}>
+                 <motion.button
+                   whileHover={{ scale: 1.05, filter: 'brightness(1.1)' }}
+                   whileTap={{ scale: 0.95 }}
+                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                   className="mt-4 px-5 py-2 rounded bg-white/10 hover:bg-white/20 border border-white/30 text-white font-medium transition-colors duration-200 self-center disabled:opacity-50 disabled:cursor-not-allowed" onClick={handleGenerateOrFinish} disabled={generationLoading || !ideaInput}>
                    {generationLoading ? 'Generating...' : 'Generate Lyrics'}
-                 </button>
+                 </motion.button>
                  {/* Display Selected Agents */}
                  <div className="text-center text-xs text-gray-400 mt-2">
                     Writing Team: {selectedAgents.map(id => availableAgents.find(a => a.id === id)?.name || id).join(', ')}
@@ -343,9 +358,13 @@ export default function Home() {
                    <label htmlFor="analyze-input" className="text-sm font-medium text-gray-300">Lyrics to Analyze:</label>
                    <textarea id="analyze-input" placeholder="Paste lyrics here for analysis..." className="w-full flex-grow p-3 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 resize-none transition-colors duration-200 min-h-[150px]" value={lyricsInput} onChange={(e) => setLyricsInput(e.target.value)} disabled={analysisLoading} /> {/* Adjusted min-h */}
                  </div>
-                 <button className="mt-1 px-5 py-2 rounded bg-white/10 hover:bg-white/20 border border-white/30 text-white font-medium transition-colors duration-200 self-center disabled:opacity-50 disabled:cursor-not-allowed" onClick={handleAnalyzeFlow} disabled={analysisLoading || !lyricsInput}>
+                 <motion.button
+                   whileHover={{ scale: 1.05, filter: 'brightness(1.1)' }}
+                   whileTap={{ scale: 0.95 }}
+                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                   className="mt-1 px-5 py-2 rounded bg-white/10 hover:bg-white/20 border border-white/30 text-white font-medium transition-colors duration-200 self-center disabled:opacity-50 disabled:cursor-not-allowed" onClick={handleAnalyzeFlow} disabled={analysisLoading || !lyricsInput}>
                    {analysisLoading ? 'Analyzing...' : 'Analyze Flow'}
-                 </button>
+                 </motion.button>
                  {/* Analysis Results Area */}
                  <div className="p-4 rounded bg-black/40 border border-white/10 flex-grow overflow-y-auto text-sm space-y-3 mt-3 min-h-[150px]"> {/* Adjusted min-h */}
                     {analysisLoading && <p className="text-gray-400">Analyzing...</p>}
@@ -381,9 +400,13 @@ export default function Home() {
                         else { setMusixmatchError("Please enter in 'Title - Artist' format."); }
                     }} className="flex gap-2 items-center">
                         <input type="text" placeholder="Enter Song Title - Artist" value={lyricsSearchQuery} onChange={(e) => setLyricsSearchQuery(e.target.value)} className="flex-grow p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100" disabled={musixmatchLoading} />
-                        <button className="px-4 py-2 rounded bg-purple-600/80 hover:bg-purple-500/80 text-white text-sm font-medium transition-colors duration-200 disabled:opacity-50" disabled={musixmatchLoading || !lyricsSearchQuery}>
+                        <motion.button
+                          whileHover={{ scale: 1.05, filter: 'brightness(1.1)' }}
+                          whileTap={{ scale: 0.95 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                          className="px-4 py-2 rounded bg-purple-600/80 hover:bg-purple-500/80 text-white text-sm font-medium transition-colors duration-200 disabled:opacity-50" disabled={musixmatchLoading || !lyricsSearchQuery}>
                             {musixmatchLoading ? 'Searching...' : 'Search'}
-                        </button>
+                        </motion.button>
                     </form>
                     <div className="mt-4 p-3 rounded bg-black/30 border border-white/10 min-h-[100px] max-h-[300px] overflow-y-auto text-xs">
                         {musixmatchLoading && <p className="text-gray-400 italic">Loading lyrics...</p>}
@@ -411,10 +434,15 @@ export default function Home() {
               </div>
 
             </div> {/* End of 3-column grid */}
-        </section>
+        </motion.section>
 
         {/* --- Features Section --- */}
-        <section className="w-full max-w-4xl text-center my-16 sm:my-24">
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="w-full max-w-4xl text-center my-16 sm:my-24"
+        >
             <h2 className="text-3xl font-bold mb-6 text-white">Key Features</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white/5 p-4 rounded-lg border border-white/10 backdrop-blur-sm">
@@ -430,10 +458,15 @@ export default function Home() {
                     <p className="text-sm text-gray-300">Use analysis results to guide AI generation for consistent style and structure.</p>
                 </div>
             </div>
-        </section>
+        </motion.section>
 
         {/* --- Music Section (Combined Artist + Top Songs) --- */}
-         <section className="w-full max-w-6xl my-16 sm:my-24 backdrop-blur-sm bg-black/30 p-6 sm:p-8 rounded-lg border border-white/10">
+         <motion.section
+           initial={{ opacity: 0, y: 20 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ duration: 0.5, delay: 0.6 }}
+           className="w-full max-w-6xl my-16 sm:my-24 backdrop-blur-sm bg-black/30 p-6 sm:p-8 rounded-lg border border-white/10"
+         >
              {/* Graphs/Trends Placeholder Section Removed */}
              {/* Spotify Embeds */}
              <div
@@ -471,10 +504,15 @@ export default function Home() {
                       ></iframe>
                  </div>
              </div>
-        </section>
+        </motion.section>
 
         {/* --- About Me Section --- */}
-        <section className="w-full max-w-4xl my-16 sm:my-24 text-center backdrop-blur-sm bg-black/30 p-6 sm:p-8 rounded-lg border border-white/10">
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.8 }}
+          className="w-full max-w-4xl my-16 sm:my-24 text-center backdrop-blur-sm bg-black/30 p-6 sm:p-8 rounded-lg border border-white/10"
+        >
              <h2 className="text-3xl font-bold mb-8 text-white">About Me</h2>
              {/* Image Collage */}
              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8 max-w-md mx-auto">
@@ -512,12 +550,17 @@ export default function Home() {
              <p className="text-sm text-gray-400 mt-4">
                 Founded by Bryan Alvin Bagorogoza, APIT is a home for creatives, with a future vision extending into film and beyond.
              </p>
-        </section>
+        </motion.section>
 
         {/* Footer */}
-        <footer className="w-full text-center text-xs text-gray-300/80 mt-10 py-4 border-t border-white/10">
+        <motion.footer
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 1.0 }}
+          className="w-full text-center text-xs text-gray-300/80 mt-10 py-4 border-t border-white/10"
+        >
           A Place In Time Entertainment
-        </footer>
+        </motion.footer>
       </main>
 
       {/* Floating Controls Container - Top Left for Chatbot */}
