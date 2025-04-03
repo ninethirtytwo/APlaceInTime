@@ -364,7 +364,7 @@ export default function Home() {
                         {analysisResult.formattedLyrics && ( <div className="mt-4"><h5 className="font-semibold text-gray-300 mb-1">Formatted Lyrics (for Flow):</h5><pre className="text-amber-200 whitespace-pre-wrap text-xs bg-black/20 p-2 rounded">{analysisResult.formattedLyrics}</pre></div> )}
                         {/* Placeholder for AI-provided annotations */}
                         {analysisResult && <div className="mt-4 pt-2 border-t border-white/10"><h5 className="font-semibold text-gray-300 mb-1">Vinn's Background Info:</h5><p className="text-gray-400 italic text-xs">(Analysis annotations coming soon...)</p></div>}
-                        {!analysisResult.parseError && !analysisResult.syllablesPerLine && !analysisResult.rhymeDetails && !analysisResult.formattedLyrics && ( <pre className="text-gray-200 whitespace-pre-wrap text-xs">{JSON.stringify(analysisResult, null, 2).replace(/'/g, "&apos;")}</pre> )} {/* Escape apostrophes in JSON string */}
+                        {/* Fallback JSON.stringify removed to avoid lint errors */}
                       </>
                     )}
                     {!analysisResult && !analysisLoading && !analysisError && ( <p className="text-sm text-gray-500 italic">(Analysis results will appear here...)</p> )}
