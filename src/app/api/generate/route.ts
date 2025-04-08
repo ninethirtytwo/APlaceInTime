@@ -154,7 +154,7 @@ export async function POST(request: Request) {
     }
 
     // --- Use Claude API ---
-    const model = "claude-3-opus-20240229"; // Or claude-3-sonnet...
+    const model = "claude-3.7-sonnet-20240715"; // Switched to the latest Sonnet 3.7 model
 
     // Build the dynamic prompt using the helper function
     const finalPrompt = buildAgentPrompt(idea, agents, genre || '', era || '', mood || '', context, analysis, storyline, structureId); // Pass structureId
