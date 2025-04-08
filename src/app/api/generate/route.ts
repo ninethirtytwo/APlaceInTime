@@ -25,7 +25,8 @@ function buildAgentPrompt(
     mood: string,
     contextLyrics?: string | null,
     analysisContext?: AnalysisContext | null, // Use the interface, allow null
-    storyline?: string | null // Add storyline parameter
+    storyline?: string | null, // Add storyline parameter
+    structureId?: string | null // Use structureId instead of structure object
 ): string {
   let prompt = `You are an expert songwriting assistant collaborating with a user, acting as a specific AI writing team member or a lead integrating multiple perspectives. `;
 
@@ -78,15 +79,63 @@ function buildAgentPrompt(
     prompt += ` Use the following existing lyrics as context or inspiration:\n---\n${contextLyrics}\n---\n`;
     prompt += ` Either continue them seamlessly or write new lyrics inspired by them and the analysis.`;
   } else {
-     prompt += ` Generate complete lyrics including verses and a chorus minimum.`;
+     prompt += ` Generate complete lyrics.`; // Simplified base instruction
   }
   // Request structure labels
-  prompt += ` Clearly label the different sections of the song using bracketed tags like [Verse 1], [Chorus], [Bridge], [Hook], [Pre-Hook], [Outro], etc. Place each label on its **own line** before the section begins.`; // Added emphasis on own line
+  prompt += ` Clearly label the different sections of the song using bracketed tags like [Verse 1], [Chorus], [Bridge], [Hook], [Pre-Chorus], [Outro], etc. **Each label must be on its own line.**`; // Added Pre-Chorus to example labels
+
+  // Add structure instructions based on structureId
+  prompt += `\n\nUse the following song structure format: `;
+  switch (structureId) {
+    case 'verse-chorus':
+      prompt += `Standard Verse-Chorus (e.g., Verse 1, Chorus, Verse 2, Chorus). Include at least 2 verses.`;
+      break;
+    case 'verse-chorus-bridge':
+      prompt += `Verse-Chorus-Bridge (e.g., Verse 1, Chorus, Verse 2, Chorus, Bridge, Chorus). Include at least 2 verses.`;
+      break;
+    case 'verse-prechorus-chorus':
+      prompt += `Verse-PreChorus-Chorus (e.g., Verse 1, Pre-Chorus, Chorus, Verse 2, Pre-Chorus, Chorus). Include at least 2 verses.`;
+      break;
+    case 'strophic':
+      prompt += `Strophic (Verse Repeating, AAA...). Write several verses (at least 3) with the same melody but different lyrics. No distinct chorus section.`;
+      break;
+    case 'aaba':
+      prompt += `AABA (32-Bar Form). Structure it as A section (8 bars), A section (8 bars, different lyrics), B section/Bridge (8 bars, contrasting), A section (8 bars, return to main theme).`;
+      break;
+    case '12-bar-blues':
+      prompt += `12-Bar Blues. Follow the standard 12-bar blues progression and AAB lyrical pattern if appropriate for the idea.`;
+      break;
+    case 'pop-standard':
+      prompt += `Standard Pop (VCVCBC - Verse, Chorus, Verse, Chorus, Bridge, Chorus).`;
+      break;
+    case 'pop-modern':
+      prompt += `Modern Pop Formula (Intro, Verse, Pre-Chorus, Chorus, Verse, Pre-Chorus, Chorus, Bridge, Chorus, Outro). Ensure a catchy hook in the chorus and pre-chorus.`;
+      break;
+    case 'pop-chorus-first':
+      prompt += `Chorus First Pop. Start the song directly with the [Chorus] section for immediate impact, then proceed with verses, etc.`;
+      break;
+    case 'rock-standard-solo':
+      prompt += `Standard Rock with Solo (e.g., Intro, Verse, Chorus, Verse, Chorus, Bridge, Guitar Solo, Chorus, Outro).`;
+      break;
+    case 'hiphop-standard':
+      prompt += `Standard Hip-Hop (e.g., Intro, Verse 1, Chorus/Hook, Verse 2, Chorus/Hook, Bridge, Verse 3, Chorus/Hook, Outro). Use 16-bar verses typically.`;
+      break;
+    case 'hiphop-hook-emphasis':
+      prompt += `Hip-Hop Hook Emphasis (e.g., Hook, Verse 1, Hook, Verse 2, Hook, Bridge, Hook). Focus on a repetitive, catchy hook.`;
+      break;
+    case 'through-composed':
+      prompt += `Through-Composed. Do not repeat any major sections. Develop the music and lyrics continuously to follow the narrative or idea.`;
+      break;
+    case 'custom':
+    default: // Default to AI deciding if 'custom' or unknown ID is selected
+      prompt += `AI Decides Best. Analyze the user's idea, genre, mood, and era, then choose the most appropriate and effective song structure. Ensure it includes at least a verse and a chorus or hook.`;
+      break;
+  }
 
   prompt += `\n\nUser Idea/Request: "${idea}"`;
 
   // Explicitly request the desired formatting
-  prompt += `\n\nIMPORTANT: Format the generated lyrics output carefully. Use '\\n' to represent line breaks. Each distinct lyrical line should start on a new line (using '\\n'). **Crucially, also use '\\n' within a lyrical line to indicate significant rhythmic pauses, breaths, or melodic phrases, similar to this flow example:** "Iced out, I flex this\\nnew drop\\nFresh pack\\nwho's next up?". Ensure structure labels like [Chorus] are also on their own lines. Do not include any other explanatory text, just the formatted lyrics.`; // Refined formatting instruction
+  prompt += `\n\nIMPORTANT: Format the generated lyrics output carefully. Use '\\n' ONLY for line breaks. Each distinct lyrical line MUST start on a new line (begin with '\\n' if it's not the very first line). Also use '\\n' within a lyrical line to indicate significant rhythmic pauses or breaths, like this flow example: "Iced out, I flex this\\nnew drop\\nFresh pack\\nwho's next up?". Ensure structure labels like [Chorus] are also on their own lines, preceded by '\\n'. Output ONLY the formatted lyrics, with no other explanatory text before or after.`; // Further refined formatting instruction
 
   return prompt;
 }
@@ -94,7 +143,7 @@ function buildAgentPrompt(
 
 export async function POST(request: Request) {
   try {
-    const { prompt: idea, context, agents, genre, era, mood, storyline, analysis } = await request.json(); // Add storyline
+    const { prompt: idea, context, agents, genre, era, mood, storyline, analysis, structureId } = await request.json(); // Use structureId
 
     // Basic validation
     if (!idea || typeof idea !== 'string') {
@@ -108,7 +157,7 @@ export async function POST(request: Request) {
     const model = "claude-3-opus-20240229"; // Or claude-3-sonnet...
 
     // Build the dynamic prompt using the helper function
-    const finalPrompt = buildAgentPrompt(idea, agents, genre || '', era || '', mood || '', context, analysis, storyline); // Pass storyline
+    const finalPrompt = buildAgentPrompt(idea, agents, genre || '', era || '', mood || '', context, analysis, storyline, structureId); // Pass structureId
 
     console.log(`Sending final prompt to Claude (length: ${finalPrompt.length}): ${finalPrompt.substring(0, 300)}...`); // Log beginning of prompt
 
@@ -128,7 +177,15 @@ export async function POST(request: Request) {
       }
 
       console.log("Claude Response Text:", generatedLyrics);
-      return NextResponse.json({ generatedLyrics });
+      // Basic check if the response looks like lyrics or an error message
+      if (generatedLyrics.startsWith('[')) { // Assume lyrics start with a structure tag
+          return NextResponse.json({ generatedLyrics });
+      } else {
+          // If it doesn't look like lyrics, treat it as an explanation/error from Claude
+          console.warn("Claude response did not start with expected structure tag, treating as explanation/error.");
+          // Return the plain text response wrapped in an error object for the frontend
+          return NextResponse.json({ error: `Claude responded: ${generatedLyrics.substring(0, 300)}${generatedLyrics.length > 300 ? '...' : ''}` }, { status: 200 }); // Use 200 to let frontend display the message
+      }
 
     } catch (apiError) { // Use unknown or Error type
         console.error("Claude API Error during generation:", apiError);

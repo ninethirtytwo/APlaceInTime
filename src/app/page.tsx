@@ -69,7 +69,8 @@ export default function Home() {
   const [selectedAgents, setSelectedAgents] = useState<string[]>(['lead']);
   const [selectedGenre, setSelectedGenre] = useState('');
   const [selectedEra, setSelectedEra] = useState('');
-  const [selectedMood, setSelectedMood] = useState(''); // Changed from moodInput
+  const [selectedMood, setSelectedMood] = useState('');
+  const [selectedStructureId, setSelectedStructureId] = useState('verse-chorus'); // Default structure
 
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0.1);
@@ -125,6 +126,7 @@ export default function Home() {
     const storyline = storylineInput; // Get storyline
     const contextLyrics = null;
     try {
+      console.log("Sending generation request:", { prompt: promptInput, agents: selectedAgents, genre: selectedGenre, era: selectedEra, mood: selectedMood, storyline, analysis: analysisResult });
       const response = await fetch('/api/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -136,14 +138,74 @@ export default function Home() {
               era: selectedEra,
               mood: selectedMood,
               storyline: storyline,
-              analysis: analysisResult
+              analysis: analysisResult,
+              structureId: selectedStructureId // Send the selected structure ID
           }),
       });
-      const data = await response.json();
-      if (!response.ok) { throw new Error(data.error || `HTTP error! status: ${response.status}`); }
+
+      // Check if response is OK first
+      if (!response.ok) {
+          let errorMsg = `Error: HTTP status ${response.status}`;
+          try {
+              // Try to get a more specific error from the response body
+              const errorData = await response.json();
+              errorMsg = errorData.error || errorMsg; // Use error from API if available
+          } catch { /* Ignore if response body is not JSON */ }
+          throw new Error(errorMsg);
+      }
+
+      // Now try to parse the JSON body
+      let data;
+      try {
+          data = await response.json();
+      } catch (jsonError) {
+          console.error("Failed to parse JSON response:", jsonError);
+          throw new Error("The AI returned an unexpected response format. Please try again or adjust parameters.");
+      }
+
+      // Check for error field within the JSON data (as returned by our improved API route)
+      if (data.error) {
+          console.warn("API returned an error/explanation:", data.error);
+          // Display the explanation from Claude directly
+          throw new Error(data.error);
+      }
+
+      // Check that we actually got lyrics
+      if (!data.generatedLyrics) {
+          console.error("API response missing 'generatedLyrics' field:", data);
+          throw new Error("No lyrics were returned from the generator API.");
+      }
+
       setGeneratedLyrics(data.generatedLyrics);
-    } catch (error) { console.error("Generation fetch error:", error); setGenerationError(error instanceof Error ? error.message : "Failed to fetch generation."); }
-    finally { setGenerationLoading(false); }
+
+    } catch (error) {
+        console.error("Generation fetch error:", error);
+
+        // Create a more user-friendly error message based on the error type
+        let userErrorMessage = "Failed to generate lyrics.";
+        if (error instanceof Error) {
+            const errorText = error.message;
+
+            if (errorText.startsWith("Claude responded:")) {
+                // This is our custom format where Claude's explanation is returned
+                userErrorMessage = errorText; // Show Claude's explanation directly
+            } else if (errorText.includes("unexpected response format")) {
+                userErrorMessage = "The AI returned an unexpected response format. Please try a different genre/era combination.";
+            } else if (errorText.toLowerCase().includes("quota") || errorText.toLowerCase().includes("limit")) {
+                userErrorMessage = "Generation limit reached. Please try again later.";
+            } else if (errorText.includes("HTTP status 5") || errorText.includes("service is currently unavailable")) { // Check for 5xx errors
+                 userErrorMessage = 'The music generation service is temporarily unavailable. Please try again later.';
+            } else if (errorText.includes("HTTP status 401") || errorText.includes("HTTP status 403")) { // Check for Auth errors
+                 userErrorMessage = 'Authentication error. Please check API key setup.';
+            } else {
+                // Use the raw error message for other cases
+                userErrorMessage = error.message;
+            }
+        }
+        setGenerationError(userErrorMessage);
+    } finally {
+        setGenerationLoading(false);
+    }
   }
 
   // --- Audio Handling ---
@@ -328,6 +390,41 @@ export default function Home() {
                       </select>
                    </div>
                  </div>
+ 
+                  {/* --- Song Structure Dropdown --- */}
+                  <div className="flex flex-col gap-1">
+                    <label htmlFor="structure-select" className="text-sm font-medium text-gray-300">Song Structure:</label>
+                    <select
+                      id="structure-select"
+                      className="p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 disabled:opacity-60 transition-colors duration-200"
+                      disabled={generationLoading}
+                      value={selectedStructureId}
+                      onChange={(e) => setSelectedStructureId(e.target.value)}
+                    >
+                      {/* Populate options from the parsed structures */}
+                      {[
+                        { id: 'verse-chorus', name: 'Verse-Chorus (Standard)' },
+                        { id: 'verse-chorus-bridge', name: 'Verse-Chorus-Bridge' },
+                        { id: 'verse-prechorus-chorus', name: 'Verse-PreChorus-Chorus' },
+                        { id: 'strophic', name: 'Strophic (Verse Repeating)' },
+                        { id: 'aaba', name: 'AABA (32-Bar Form)' },
+                        { id: '12-bar-blues', name: '12-Bar Blues' },
+                        { id: 'pop-standard', name: 'Pop: Standard (VCVCBC)' },
+                        { id: 'pop-modern', name: 'Pop: Modern Formula (IVPCPCVPCBC...)' },
+                        { id: 'pop-chorus-first', name: 'Pop: Chorus First' },
+                        { id: 'rock-standard-solo', name: 'Rock: Standard w/ Solo' },
+                        { id: 'hiphop-standard', name: 'Hip-Hop: Standard (IVCVBCVC...)' },
+                        { id: 'hiphop-hook-emphasis', name: 'Hip-Hop: Hook Emphasis (HVHVH)' },
+                        { id: 'through-composed', name: 'Through-Composed (No Repeats)' },
+                        { id: 'custom', name: 'Custom (AI Decides Best)' },
+                      ].map(structure => (
+                        <option key={structure.id} value={structure.id}>
+                          {structure.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {/* --- End Song Structure Dropdown --- */}
                  {/* Storyline Input */}
                  <div className="flex flex-col gap-2">
                    <label htmlFor="storyline-input" className="text-sm font-medium text-gray-300">Storyline / Narrative (Optional):</label>
@@ -351,7 +448,8 @@ export default function Home() {
                     {generationError && <p className="text-sm text-red-400">Error: {generationError}</p>}
                     {generatedLyrics && !generationLoading && !generationError && (
                       <TypeAnimation
-                        sequence={[generatedLyrics]} // Pass the lyrics as the sequence
+                        // Replace literal '\n' with actual newline characters for display
+                        sequence={[generatedLyrics.replace(/\\n/g, '\n')]}
                         // wrapper="pre" // Removed wrapper prop to resolve TS error, pre is often default
                         speed={80} // Adjust typing speed (lower is faster)
                         cursor={true}
