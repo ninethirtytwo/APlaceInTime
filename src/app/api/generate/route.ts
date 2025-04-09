@@ -154,7 +154,7 @@ export async function POST(request: Request) {
     }
 
     // --- Use Claude API ---
-    const model = "claude-3.5-sonnet-20240620"; // Reverted to confirmed working Sonnet 3.5 model
+    const model = "claude-3-5-sonnet-20240620"; // Corrected typo: Use hyphens instead of period
 
     // Build the dynamic prompt using the helper function
     const finalPrompt = buildAgentPrompt(idea, agents, genre || '', era || '', mood || '', context, analysis, storyline, structureId); // Pass structureId

@@ -453,9 +453,7 @@ export default function Home() {
                         // wrapper="pre" // Removed wrapper prop to resolve TS error, pre is often default
                         speed={80} // Adjust typing speed (lower is faster)
                         cursor={true}
-                        className="text-sm text-gray-100 whitespace-pre-wrap"
-                        // Optionally repeat, but likely not desired here
-                        // repeat={Infinity}
+                        className="text-sm text-gray-100 whitespace-pre-wrap" // Ensure whitespace is preserved
                       />
                     )}
                     {!generatedLyrics && !generationLoading && !generationError && ( <p className="text-sm text-gray-500 italic">(Generated lyrics/story will appear here...)</p> )}
@@ -574,108 +572,119 @@ export default function Home() {
             </div>
         </motion.section>
 
-        {/* --- Music Section (Combined Artist + Top Songs) --- */}
+         {/* --- Spotify Section (Using Iframes) --- */}
          <motion.section
-           initial={{ opacity: 0, y: 20 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ duration: 0.5, delay: 0.6 }}
-           className="w-full max-w-6xl my-16 sm:my-24 backdrop-blur-sm bg-black/30 p-6 sm:p-8 rounded-lg border border-white/10"
+           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4, duration: 0.5 }}
+           id="spotify-section" className="w-full max-w-screen-lg xl:max-w-screen-xl mb-16 sm:mb-24"
          >
-             {/* Graphs/Trends Placeholder Section Removed */}
-             {/* Spotify Embeds */}
-             <div
-                className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start"
-                onClick={pauseBackgroundAudio}
-                onFocus={pauseBackgroundAudio}
-                tabIndex={-1}
-             >
-                 {/* My Artist Info Column */}
-                 <div className="flex flex-col items-center">
-                     <h3 className="text-2xl font-bold mb-4 text-white">My Music</h3>
-                     <p className="text-sm text-gray-300 mb-6 text-center">Experience my beats and tracks.</p>
-                     {/* Artist Embed iframe */}
-                     <iframe
-                        style={{ borderRadius: '12px', border: 'none', width: '100%', maxWidth: '400px', height: '352px' }}
-                        src="https://open.spotify.com/embed/artist/3i7KKztiuNxSgo146aHLIZ?utm_source=generator&theme=0"
-                        allowFullScreen={false}
-                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                        loading="lazy"
-                        title="Spotify Artist Embed - BryAlvin XII"
-                      ></iframe>
-                 </div>
-                 {/* Top Songs Column */}
-                 <div className="flex flex-col items-center">
-                      <h3 className="text-2xl font-bold mb-4 text-white">Top Global Songs</h3>
-                      <p className="text-sm text-gray-300 mb-6 text-center">Current hits on Spotify.</p>
-                      {/* Top 50 Playlist iframe embed */}
-                      <iframe
-                        style={{ borderRadius: '12px', border: 'none', width: '100%', maxWidth: '400px', height: '352px' }}
-                        src="https://open.spotify.com/embed/playlist/37i9dQZEVXbMDoHDwVN2tF?utm_source=generator&theme=0"
-                        allowFullScreen={false}
-                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                        loading="lazy"
-                        title="Spotify Top 50 Global Playlist"
-                      ></iframe>
-                 </div>
+           <div className="text-center mb-8">
+             <h2 className="text-3xl font-bold mb-2 text-white">Featured Artist & Top Tracks</h2>
+             <p className="text-md text-gray-300">Explore music from A Place In Time</p>
+           </div>
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 backdrop-blur-lg bg-black/40 p-6 sm:p-8 rounded-xl shadow-2xl border border-white/10">
+             {/* Artist Embed */}
+             <div className="flex flex-col items-center">
+               <h3 className="text-xl font-semibold text-white mb-4">Featured Artist: Vinn</h3>
+               <iframe
+                 title="Spotify Embed: Vinn"
+                 src="https://open.spotify.com/embed/artist/3i7KKztiuNxSgo146aHLIZ?utm_source=generator&theme=0" // Dark theme
+                 width="100%"
+                 height="352" // Standard height for artist embed
+                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                 loading="lazy"
+                 className="rounded-lg border border-white/10"
+                 onLoad={pauseBackgroundAudio} // Pause background audio when iframe loads
+               ></iframe>
              </div>
+             {/* Top Tracks Embed */}
+             <div className="flex flex-col items-center">
+               <h3 className="text-xl font-semibold text-white mb-4">Global Top Tracks</h3>
+               <iframe
+                 title="Spotify Embed: Top 50 Global"
+                 src="https://open.spotify.com/embed/playlist/37i9dQZEVXbMDoHDwVN2tF?utm_source=generator&theme=0" // Dark theme
+                 width="100%"
+                 height="352" // Standard height for playlist embed
+                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                 loading="lazy"
+                 className="rounded-lg border border-white/10"
+                 onLoad={pauseBackgroundAudio} // Pause background audio when iframe loads
+               ></iframe>
+             </div>
+           </div>
+         </motion.section>
+
+        {/* --- Visual Inspirations Section --- */}
+        <motion.section
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6, duration: 0.5 }}
+          id="visuals-section" className="w-full max-w-screen-lg xl:max-w-screen-xl mb-16 sm:mb-24"
+        >
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold mb-2 text-white">Visual Inspirations</h2>
+            <p className="text-md text-gray-300">Moodboard & Aesthetics</p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 backdrop-blur-lg bg-black/40 p-6 sm:p-8 rounded-xl shadow-2xl border border-white/10">
+            {[ 'VINN1.jpg', 'VINN2.jpg', 'VINN4.jpg', 'VINN7.jpg', 'VINN55.jpg', 'VINN56.jpg'].map((imgName) => (
+                <div key={imgName} className="relative aspect-square overflow-hidden rounded-lg shadow-lg border border-white/10">
+                    <Image
+                        src={`/${imgName}`}
+                        alt={`Visual Inspiration ${imgName}`}
+                        fill
+                        style={{ objectFit: 'cover' }}
+                        sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 16vw"
+                        quality={75}
+                    />
+                </div>
+            ))}
+          </div>
         </motion.section>
 
         {/* --- About Me Section --- */}
         <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.8 }}
-          className="w-full max-w-4xl my-16 sm:my-24 text-center backdrop-blur-sm bg-black/30 p-6 sm:p-8 rounded-lg border border-white/10"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8, duration: 0.5 }}
+          id="about-section" className="w-full max-w-screen-lg xl:max-w-screen-xl mb-16 sm:mb-24"
         >
-             <h2 className="text-3xl font-bold mb-8 text-white">About Me</h2>
-             {/* Image Collage */}
-             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8 max-w-md mx-auto">
-                {[ 'VINN1.jpg', 'VINN2.jpg', 'VINN4.jpg', 'VINN7.jpg', 'VINN55.jpg', 'VINN56.jpg'].map((imgName) => (
-                    <div key={imgName} className="relative aspect-square overflow-hidden rounded-lg shadow-lg border border-white/10">
-                        <Image
-                            src={`/${imgName}`}
-                            alt={`Image of BryAlvin XII - ${imgName}`}
-                            layout="fill"
-                            objectFit="cover"
-                            className="transition-transform duration-300 hover:scale-105"
-                        />
-                    </div>
-                ))}
+          <div className="text-center mb-4">
+             <button onClick={() => setIsAboutExpanded(!isAboutExpanded)} className="text-xl font-semibold text-white hover:text-pink-300 transition-colors duration-200">
+               About Vinn {isAboutExpanded ? '▲' : '▼'}
+             </button>
+          </div>
+          <motion.div
+             initial={false}
+             animate={{ height: isAboutExpanded ? 'auto' : 0, opacity: isAboutExpanded ? 1 : 0 }}
+             transition={{ duration: 0.3 }}
+             className="overflow-hidden"
+          >
+             <div className="backdrop-blur-lg bg-black/40 p-6 sm:p-8 rounded-xl shadow-2xl border border-white/10 text-gray-300 text-sm sm:text-base space-y-3">
+               <p>Welcome to A Place In Time Entertainment, the nexus where lyrical artistry meets cutting-edge AI. Founded by Vinn, this platform is dedicated to empowering artists by providing innovative tools to refine their craft, analyze their flow, and generate inspired lyrics.</p>
+               <p>Our mission is to blend human creativity with artificial intelligence, creating a unique space for musical exploration and development. Whether you're analyzing rhyme schemes, exploring new flow patterns, or collaborating with our AI writing team, A Place In Time is your partner in pushing creative boundaries.</p>
+               <p>Join us in shaping the future of music creation.</p>
              </div>
-             {/* Collapsible Bio */}
-             <div className="text-md text-gray-200 mb-4 max-w-2xl mx-auto text-left sm:text-center">
-                <p className={`transition-all duration-300 ease-in-out overflow-hidden ${isAboutExpanded ? 'max-h-full' : 'max-h-12 sm:max-h-6'}`}>
-                    Hey, I’m <span className="font-semibold">BryAlvin XII</span> – a record producer and artist originally from Kampala, Uganda and now based in Berlin. I built this AI tool to break creative boundaries and help fellow artists overcome writer’s block. My journey in music has always been about blending tradition with innovation, and this platform is a testament to that passion. Whether you’re here to craft the next hit lyric or discover fresh beats, I’m excited to share my world with you.
-                </p>
-                <button
-                    onClick={() => setIsAboutExpanded(!isAboutExpanded)}
-                    className="text-blue-400 hover:text-blue-300 text-sm mt-1"
-                >
-                    {isAboutExpanded ? 'Read Less' : 'Read More...'}
-                </button>
-             </div>
-             <p className="text-md text-gray-300 italic max-w-2xl mx-auto">
-                "I created this tool because I know the struggle of facing a blank page. With AI on our side, creativity flows easier and faster, letting us focus on the art and emotion behind every lyric."
-             </p>
-             <p className="text-lg font-semibold text-white mt-6 mb-2">A Place In Time Entertainment</p>
-             <p className="text-md text-gray-300 italic">
-                "Crafting timeless creativity from this moment to eternity, leaving a boundless impact on culture."
-             </p>
-             <p className="text-sm text-gray-400 mt-4">
-                Founded by Bryan Alvin Bagorogoza, APIT is a home for creatives, with a future vision extending into film and beyond.
-             </p>
+          </motion.div>
         </motion.section>
 
-        {/* Footer */}
+        {/* --- Footer --- */}
         <motion.footer
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 1.0 }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.0, duration: 0.5 }}
           className="w-full text-center text-xs text-gray-300/80 mt-10 py-4 border-t border-white/10"
         >
           A Place In Time Entertainment
         </motion.footer>
+
       </main>
+
+      {/* --- Background Image --- */}
+      <div className="fixed inset-0 -z-10">
+         <Image
+           src="/darker.png" // Use the darker image
+           alt="Background"
+           fill
+           style={{ objectFit: 'cover' }}
+           quality={85}
+           priority // Load background image faster
+         />
+         {/* Optional overlay */}
+         <div className="absolute inset-0 bg-black/60"></div>
+      </div>
 
       {/* Floating Controls Container - Top Left for Chatbot */}
        <div className="fixed top-5 left-5 z-50 flex flex-col gap-4">
