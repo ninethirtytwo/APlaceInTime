@@ -92,8 +92,20 @@ export default function Home() {
   const [lyricsSearchQuery, setLyricsSearchQuery] = useState(''); // State for the lyrics search input
   const [isAboutExpanded, setIsAboutExpanded] = useState(false); // State for About Me collapse
   const [isChatbotOpen, setIsChatbotOpen] = useState(false); // State for chatbot visibility
+  const [isDarkMode, setIsDarkMode] = useState(false); // State for dark mode toggle
 
   // --- Handler Functions ---
+  // Function to toggle dark mode
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+    // Toggle the dark-mode class on the root element
+    if (!isDarkMode) {
+      document.documentElement.classList.add('dark-mode');
+    } else {
+      document.documentElement.classList.remove('dark-mode');
+    }
+  };
+
   const handleAgentSelection = (agentId: string) => {
     setSelectedAgents(prev =>
       prev.includes(agentId) ? prev.filter(id => id !== agentId) : [...prev, agentId]
@@ -208,6 +220,26 @@ export default function Home() {
     }
   }
 
+  // --- Dark Mode Handling ---
+  // Effect to initialize dark mode
+  useEffect(() => {
+    // Check if dark mode was previously enabled
+    const isDarkModeEnabled = localStorage.getItem('darkMode') === 'true';
+    setIsDarkMode(isDarkModeEnabled);
+
+    // Apply dark mode class if needed
+    if (isDarkModeEnabled) {
+      document.documentElement.classList.add('dark-mode');
+    } else {
+      document.documentElement.classList.remove('dark-mode');
+    }
+  }, []);
+
+  // Update localStorage when dark mode changes
+  useEffect(() => {
+    localStorage.setItem('darkMode', isDarkMode.toString());
+  }, [isDarkMode]);
+
   // --- Audio Handling ---
   useEffect(() => {
     if (!audioRef.current) {
@@ -277,6 +309,22 @@ export default function Home() {
   return (
     <>
       <main className="relative flex min-h-screen flex-col items-center p-4 sm:p-8 text-white">
+        {/* Dark Mode Toggle Button */}
+        <button
+          onClick={toggleDarkMode}
+          className="fixed top-4 right-4 z-50 p-2 rounded-full bg-black/50 hover:bg-black/70 border border-white/20 transition-colors duration-200"
+          aria-label={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        >
+          {isDarkMode ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+          )}
+        </button>
 
         {/* --- Header Section --- */}
         <motion.header

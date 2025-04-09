@@ -4,6 +4,11 @@
   /* Force dark theme colors */
   --background: #0a0a0a; /* Dark background */
   --foreground: #ededed; /* Light text */
+  --bg-image: url('/bonfiree44.jpeg'); /* Default light mode background */
+}
+
+:root.dark-mode {
+  --bg-image: url('/darker.png'); /* Dark mode background */
 }
 
 @theme inline {
@@ -13,25 +18,14 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Removed duplicate body styles and combined them */
 body {
-  background-image: url('/bonfireblack.jpeg'); /* Or another image from /public */
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed; /* Keep background fixed during scroll */
-  background-repeat: no-repeat;
-}
-
-/* Removed @media query for dark mode preference to force dark theme */
-
-body {
-  /* background: var(--background); */ /* Replaced by image */
   color: var(--foreground);
-  background-image: url('/bonfiree44.jpeg'); /* Updated background image */
+  background-image: var(--bg-image); /* Use CSS variable for background image */
   background-size: cover;
   background-position: center center;
   background-attachment: fixed; /* Keep background fixed during scroll */
+  background-repeat: no-repeat;
   min-height: 100vh;
-  /* Apply blur directly to background - might affect performance, alternative is pseudo-element */
-  /* filter: blur(5px); */ /* Let's skip direct blur for now, use backdrop-filter on content */
-  /* font-family is handled by Tailwind and layout.tsx */
+  transition: background-image 0.5s ease-in-out; /* Smooth transition between backgrounds */
 }
