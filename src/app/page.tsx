@@ -9,17 +9,17 @@ import Chatbot from '@/components/Chatbot'; // Import Chatbot component
 // Removed import for SpotifyTopSongs as we use iframe now
 
 // --- Agent Data (Updated) ---
-// Add placeholder avatar paths - replace with actual paths in /public/avatars/ later
+// Updated avatar paths to use the writing team avatars folder
 interface Agent { id: string; name: string; description: string; avatar: string; }
 const availableAgents: Agent[] = [
-    { id: 'lead', name: 'Ava Clarke – The Mastermind', description: 'Supervises and integrates styles.', avatar: '/avatars/lead.png' },
-    { id: 'poet', name: 'Elias Fontaine – The Wordsmith', description: 'Metaphors, wordplay, imagery.', avatar: '/avatars/poet.png' },
-    { id: 'mood', name: 'Luna Rivers – The Emotional Visionary', description: 'Captures specific emotions.', avatar: '/avatars/mood.png' },
-    { id: 'pop', name: 'Jay Carter – The Trendsetter', description: 'Current trends, slang, references.', avatar: '/avatars/pop.png' },
-    { id: 'analogy', name: 'Max "Sly" Dawson – The Metaphor King', description: 'Analogies, sayings, idioms.', avatar: '/avatars/analogy.png' },
-    { id: 'philosophy', name: 'Zane Mercer – The Philosopher', description: 'Philosophy, psychology, depth.', avatar: '/avatars/philosophy.png' },
-    { id: 'eras', name: 'Nova Sinclair – The Time Traveler', description: 'Writes in styles of specific eras.', avatar: '/avatars/eras.png' },
-    { id: 'genre', name: 'Rico Vega – The Shape-Shifter', description: 'Adheres to genre conventions.', avatar: '/avatars/genre.png' },
+    { id: 'lead', name: 'Ava Clarke – The Mastermind', description: 'Supervises and integrates styles.', avatar: '/writing team avatars/Ava.png' },
+    { id: 'poet', name: 'Elias Fontaine – The Wordsmith', description: 'Metaphors, wordplay, imagery.', avatar: '/writing team avatars/Elias.png' },
+    { id: 'mood', name: 'Luna Rivers – The Emotional Visionary', description: 'Captures specific emotions.', avatar: '/writing team avatars/Luna.png' },
+    { id: 'pop', name: 'Jay Carter – The Trendsetter', description: 'Current trends, slang, references.', avatar: '/writing team avatars/Jay.png' },
+    { id: 'analogy', name: 'Max "Sly" Dawson – The Metaphor King', description: 'Analogies, sayings, idioms.', avatar: '/writing team avatars/Max.png' },
+    { id: 'philosophy', name: 'Zane Mercer – The Philosopher', description: 'Philosophy, psychology, depth.', avatar: '/writing team avatars/Zane.png' },
+    { id: 'eras', name: 'Nova Sinclair – The Time Traveler', description: 'Writes in styles of specific eras.', avatar: '/writing team avatars/Nova.png' },
+    { id: 'genre', name: 'Rico Vega – The Shape-Shifter', description: 'Adheres to genre conventions.', avatar: '/writing team avatars/Rico.png' },
 ];
 // --- End Agent Data ---
 
@@ -390,7 +390,7 @@ export default function Home() {
                       </select>
                    </div>
                  </div>
- 
+
                   {/* --- Song Structure Dropdown --- */}
                   <div className="flex flex-col gap-1">
                     <label htmlFor="structure-select" className="text-sm font-medium text-gray-300">Song Structure:</label>
@@ -536,8 +536,17 @@ export default function Home() {
                 <h3 className="text-xl font-semibold text-white border-b border-white/20 pb-2">AI Writing Team</h3>
                 <div className="space-y-3 flex-grow overflow-y-auto pr-2">
                     {availableAgents.map(agent => (
-                        <div key={agent.id} className="flex items-start gap-3 p-2 rounded hover:bg-white/10 transition-colors duration-150">
+                        <div key={agent.id} className="flex items-start gap-3 p-3 rounded hover:bg-white/10 transition-colors duration-150">
                            <input type="checkbox" id={`agent-${agent.id}`} checked={selectedAgents.includes(agent.id)} onChange={() => handleAgentSelection(agent.id)} className="mt-1 accent-blue-400 h-4 w-4 flex-shrink-0" disabled={generationLoading} />
+                           <div className="relative w-12 h-12 rounded-full overflow-hidden border border-white/20 flex-shrink-0">
+                              <Image
+                                src={agent.avatar}
+                                alt={`${agent.name} avatar`}
+                                fill
+                                style={{ objectFit: 'cover' }}
+                                className="transition-transform duration-300 hover:scale-105"
+                              />
+                           </div>
                            <label htmlFor={`agent-${agent.id}`} className="flex flex-col cursor-pointer">
                               <span className="font-medium text-sm text-gray-100">{agent.name}</span>
                               <span className="text-xs text-gray-400">{agent.description}</span>
@@ -620,50 +629,67 @@ export default function Home() {
              </div>
         </motion.section>
 
-        {/* --- About Me Section --- */}
+        {/* --- Visual Inspirations Section --- */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.8 }}
-          className="w-full max-w-4xl my-16 sm:my-24 text-center backdrop-blur-sm bg-black/30 p-6 sm:p-8 rounded-lg border border-white/10"
+          className="w-full max-w-7xl my-16 sm:my-24 text-center backdrop-blur-sm bg-black/30 p-6 sm:p-10 rounded-lg border border-white/10"
         >
-             <h2 className="text-3xl font-bold mb-8 text-white">About Me</h2>
-             {/* Image Collage */}
-             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8 max-w-md mx-auto">
+             <div className="mb-8">
+                <h2 className="text-3xl font-bold mb-2 text-white">Visual Inspirations</h2>
+                <p className="text-md text-gray-300">Moodboard & Aesthetics</p>
+             </div>
+             {/* Horizontal Image Gallery */}
+             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6 mb-8 w-full px-2">
                 {[ 'VINN1.jpg', 'VINN2.jpg', 'VINN4.jpg', 'VINN7.jpg', 'VINN55.jpg', 'VINN56.jpg'].map((imgName) => (
-                    <div key={imgName} className="relative aspect-square overflow-hidden rounded-lg shadow-lg border border-white/10">
+                    <div key={imgName} className="relative aspect-square overflow-hidden rounded-lg shadow-lg border border-white/10 h-28 sm:h-36 md:h-40">
                         <Image
                             src={`/${imgName}`}
                             alt={`Image of BryAlvin XII - ${imgName}`}
-                            layout="fill"
-                            objectFit="cover"
+                            fill
+                            style={{ objectFit: 'cover' }}
                             className="transition-transform duration-300 hover:scale-105"
                         />
                     </div>
                 ))}
              </div>
-             {/* Collapsible Bio */}
-             <div className="text-md text-gray-200 mb-4 max-w-2xl mx-auto text-left sm:text-center">
-                <p className={`transition-all duration-300 ease-in-out overflow-hidden ${isAboutExpanded ? 'max-h-full' : 'max-h-12 sm:max-h-6'}`}>
-                    Hey, I’m <span className="font-semibold">BryAlvin XII</span> – a record producer and artist originally from Kampala, Uganda and now based in Berlin. I built this AI tool to break creative boundaries and help fellow artists overcome writer’s block. My journey in music has always been about blending tradition with innovation, and this platform is a testament to that passion. Whether you’re here to craft the next hit lyric or discover fresh beats, I’m excited to share my world with you.
-                </p>
+             {/* About Vinn Dropdown */}
+             <div className="mb-6">
                 <button
                     onClick={() => setIsAboutExpanded(!isAboutExpanded)}
-                    className="text-blue-400 hover:text-blue-300 text-sm mt-1"
+                    className="flex items-center justify-center w-full py-2 px-4 bg-black/40 hover:bg-black/50 rounded-lg border border-white/10 transition-colors duration-200"
                 >
-                    {isAboutExpanded ? 'Read Less' : 'Read More...'}
+                    <span className="font-medium text-white">About Vinn</span>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={`w-5 h-5 ml-2 transition-transform duration-200 ${isAboutExpanded ? 'rotate-180' : ''}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
                 </button>
+                {/* Collapsible Bio Content */}
+                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isAboutExpanded ? 'max-h-96 mt-4 opacity-100' : 'max-h-0 opacity-0'}`}>
+                    <div className="text-md text-gray-200 p-4 bg-black/20 rounded-lg border border-white/10">
+                        <p className="mb-4">
+                            Hey, I'm <span className="font-semibold">BryAlvin XII</span> – a record producer and artist originally from Kampala, Uganda and now based in Berlin. I built this AI tool to break creative boundaries and help fellow artists overcome writer's block. My journey in music has always been about blending tradition with innovation, and this platform is a testament to that passion. Whether you're here to craft the next hit lyric or discover fresh beats, I'm excited to share my world with you.
+                        </p>
+                        <p className="text-md text-gray-300 italic mb-4">
+                            "I created this tool because I know the struggle of facing a blank page. With AI on our side, creativity flows easier and faster, letting us focus on the art and emotion behind every lyric."
+                        </p>
+                        <p className="text-lg font-semibold text-white mb-2">A Place In Time Entertainment</p>
+                        <p className="text-md text-gray-300 italic mb-4">
+                            "Crafting timeless creativity from this moment to eternity, leaving a boundless impact on culture."
+                        </p>
+                        <p className="text-sm text-gray-400">
+                            Founded by Bryan Alvin Bagorogoza, APIT is a home for creatives, with a future vision extending into film and beyond.
+                        </p>
+                    </div>
+                </div>
              </div>
-             <p className="text-md text-gray-300 italic max-w-2xl mx-auto">
-                "I created this tool because I know the struggle of facing a blank page. With AI on our side, creativity flows easier and faster, letting us focus on the art and emotion behind every lyric."
-             </p>
-             <p className="text-lg font-semibold text-white mt-6 mb-2">A Place In Time Entertainment</p>
-             <p className="text-md text-gray-300 italic">
-                "Crafting timeless creativity from this moment to eternity, leaving a boundless impact on culture."
-             </p>
-             <p className="text-sm text-gray-400 mt-4">
-                Founded by Bryan Alvin Bagorogoza, APIT is a home for creatives, with a future vision extending into film and beyond.
-             </p>
         </motion.section>
 
         {/* Footer */}
