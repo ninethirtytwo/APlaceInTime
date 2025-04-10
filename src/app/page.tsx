@@ -12,14 +12,14 @@ import Chatbot from '@/components/Chatbot'; // Import Chatbot component
 // Updated avatar paths to use the writing team avatars folder
 interface Agent { id: string; name: string; description: string; avatar: string; }
 const availableAgents: Agent[] = [
-    { id: 'lead', name: 'Ava Clarke – The Mastermind', description: 'Supervises and integrates styles.', avatar: '/writing team avatars/Ava.png' },
-    { id: 'poet', name: 'Elias Fontaine – The Wordsmith', description: 'Metaphors, wordplay, imagery.', avatar: '/writing team avatars/Elias.png' },
-    { id: 'mood', name: 'Luna Rivers – The Emotional Visionary', description: 'Captures specific emotions.', avatar: '/writing team avatars/Luna.png' },
-    { id: 'pop', name: 'Jay Carter – The Trendsetter', description: 'Current trends, slang, references.', avatar: '/writing team avatars/Jay.png' },
-    { id: 'analogy', name: 'Max "Sly" Dawson – The Metaphor King', description: 'Analogies, sayings, idioms.', avatar: '/writing team avatars/Max.png' },
-    { id: 'philosophy', name: 'Zane Mercer – The Philosopher', description: 'Philosophy, psychology, depth.', avatar: '/writing team avatars/Zane.png' },
-    { id: 'eras', name: 'Nova Sinclair – The Time Traveler', description: 'Writes in styles of specific eras.', avatar: '/writing team avatars/Nova.png' },
-    { id: 'genre', name: 'Rico Vega – The Shape-Shifter', description: 'Adheres to genre conventions.', avatar: '/writing team avatars/Rico.png' },
+    { id: 'lead', name: 'Ava Clarke – The Mastermind', description: 'Supervises and integrates all genres.', avatar: '/writing team avatars/Ava.png' },
+    { id: 'hiphop', name: 'Elias Fontaine – Hip Hop/Rap', description: 'Flow, bars, and authentic hip hop style.', avatar: '/writing team avatars/Elias.png' },
+    { id: 'rnb', name: 'Luna Rivers – R&B and Soul', description: 'Emotional depth and soulful expression.', avatar: '/writing team avatars/Luna.png' },
+    { id: 'pop', name: 'Jay Carter – Pop', description: 'Catchy hooks and contemporary pop sensibilities.', avatar: '/writing team avatars/Jay.png' },
+    { id: 'country', name: 'Max "Sly" Dawson – Country', description: 'Storytelling with country flair and imagery.', avatar: '/writing team avatars/Max.png' },
+    { id: 'jazz', name: 'Zane Mercer – Jazz', description: 'Sophisticated harmonies and jazz-inspired lyrics.', avatar: '/writing team avatars/Zane.png' },
+    { id: 'african', name: 'Nova Sinclair – Global African', description: 'Afrobeats, Amapiano, and African musical traditions.', avatar: '/writing team avatars/Nova.png' },
+    { id: 'latin', name: 'Rico Vega – Latin/Caribbean', description: 'Reggaeton, salsa, and Latin rhythmic patterns.', avatar: '/writing team avatars/Rico.png' },
 ];
 // --- End Agent Data ---
 
