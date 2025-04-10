@@ -88,6 +88,8 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+
+
   return (
     <AnimatePresence>
       {isOpen && (

@@ -66,6 +66,7 @@ export default function Home() {
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [storylineInput, setStorylineInput] = useState(''); // State for storyline
 
+
   const [selectedAgents, setSelectedAgents] = useState<string[]>(['lead']);
   const [selectedGenre, setSelectedGenre] = useState('');
   const [selectedEra, setSelectedEra] = useState('');
@@ -240,6 +241,7 @@ export default function Home() {
     localStorage.setItem('darkMode', isDarkMode.toString());
   }, [isDarkMode]);
 
+
   // --- Audio Handling ---
   useEffect(() => {
     if (!audioRef.current) {
@@ -330,7 +332,8 @@ export default function Home() {
         <motion.header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+
           className="w-full max-w-4xl text-center mb-10 sm:mb-12 mt-8 sm:mt-12"
         >
           <h1 className="text-4xl sm:text-5xl font-bold mb-2 text-white text-shadow-lg">
@@ -345,7 +348,8 @@ export default function Home() {
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
+
           id="tool-section" className="w-full max-w-screen-lg xl:max-w-screen-xl mb-16 sm:mb-24"
         >
            <div className="text-center mb-8">
@@ -542,8 +546,41 @@ export default function Home() {
                         {analysisResult.melodySuggestion && ( <div><h5 className="font-semibold text-gray-300 mb-1">Melody Suggestion:</h5><p className="text-gray-200 italic">{analysisResult.melodySuggestion}</p></div> )}
                         {analysisResult.emotionAnalysis && ( <div><h5 className="font-semibold text-gray-300 mb-1">Emotion Analysis:</h5><p className="text-gray-200">{analysisResult.emotionAnalysis}</p></div> )} {/* Display Emotion Analysis */}
                         {analysisResult.keyObservations && analysisResult.keyObservations.length > 0 && ( <div><h5 className="font-semibold text-gray-300 mb-1">Key Observations:</h5><ul className="list-disc list-inside text-gray-200 pl-2">{analysisResult.keyObservations.map((obs: string, index: number) => <li key={index}>{obs}</li>)}</ul></div> )}
-                        {analysisResult.formattedLyrics && ( <div className="mt-4"><h5 className="font-semibold text-gray-300 mb-1">Formatted Lyrics (for Flow):</h5><pre className="text-amber-200 whitespace-pre-wrap text-xs bg-black/20 p-2 rounded">{analysisResult.formattedLyrics}</pre></div> )}
-                        {/* Placeholder for AI-provided annotations */}
+                        {analysisResult.formattedLyrics && (
+                          <div className="mt-4">
+                            <div className="flex justify-between items-center mb-1">
+                              <h5 className="font-semibold text-gray-300">Formatted Lyrics (for Flow):</h5>
+                              {!analysisLoading && !analysisError && (
+                                <motion.button
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
+                                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                                  className="px-2 py-0.5 rounded bg-purple-600/80 hover:bg-purple-500/80 text-white text-xs font-medium transition-colors duration-200 inline-flex items-center gap-1"
+                                  onClick={() => {
+                                    // Set the idea input to use this flow
+                                    const newPrompt = "Create a new song with similar flow and cadence to the analyzed lyrics";
+                                    setIdeaInput(newPrompt);
+                                    // Scroll to the generator section
+                                    document.getElementById('idea-input')?.scrollIntoView({ behavior: 'smooth' });
+                                    // Focus the idea input
+                                    document.getElementById('idea-input')?.focus();
+                                    // Start generation automatically after a short delay
+                                    setTimeout(() => {
+                                      handleGenerateOrFinish();
+                                    }, 1000);
+                                  }}
+                                  title="Creates a new song with similar flow, cadence, and rhyme scheme"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                  </svg>
+                                  Use This Flow
+                                </motion.button>
+                              )}
+                            </div>
+                            <pre className="text-amber-200 whitespace-pre-wrap text-xs bg-black/20 p-2 rounded">{analysisResult.formattedLyrics}</pre>
+                          </div>
+                        )}
                         {analysisResult && !analysisResult.parseError && <div className="mt-4 pt-2 border-t border-white/10"><h5 className="font-semibold text-gray-300 mb-1">Vinn's Background Info:</h5><p className="text-gray-400 italic text-xs">(AI-provided annotations will appear here if available...)</p></div>}
                         {/* Fallback JSON.stringify removed to avoid lint errors */}
                       </>
@@ -611,7 +648,8 @@ export default function Home() {
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          transition={{ duration: 0.5, delay: 0.4, ease: "easeOut" }}
+
           className="w-full max-w-4xl text-center my-16 sm:my-24"
         >
             <h2 className="text-3xl font-bold mb-6 text-white">Key Features</h2>
@@ -635,10 +673,18 @@ export default function Home() {
          <motion.section
            initial={{ opacity: 0, y: 20 }}
            animate={{ opacity: 1, y: 0 }}
-           transition={{ duration: 0.5, delay: 0.6 }}
+           transition={{ duration: 0.5, delay: 0.6, ease: "easeOut" }}
+
            className="w-full max-w-6xl my-16 sm:my-24 backdrop-blur-sm bg-black/30 p-6 sm:p-8 rounded-lg border border-white/10"
          >
              {/* Graphs/Trends Placeholder Section Removed */}
+             {/* Spotify Login Button */}
+             <div className="text-center mb-6">
+               <a href="https://accounts.spotify.com/login" target="_blank" rel="noopener noreferrer" className="inline-block px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-full transition-colors duration-200 font-medium text-sm">
+                 Log in to Spotify for Full Playback
+               </a>
+               <p className="text-xs text-gray-400 mt-2">Full song playback requires a Spotify login</p>
+             </div>
              {/* Spotify Embeds */}
              <div
                 className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start"
@@ -649,11 +695,11 @@ export default function Home() {
                  {/* My Artist Info Column */}
                  <div className="flex flex-col items-center">
                      <h3 className="text-2xl font-bold mb-4 text-white">My Music</h3>
-                     <p className="text-sm text-gray-300 mb-6 text-center">Experience my beats and tracks.</p>
+                     <p className="text-sm text-gray-300 mb-6 text-center">Experience my beats and tracks. <span className="text-xs italic block mt-1">(Log in to Spotify for full song playback)</span></p>
                      {/* Artist Embed iframe */}
                      <iframe
                         style={{ borderRadius: '12px', border: 'none', width: '100%', maxWidth: '400px', height: '352px' }}
-                        src="https://open.spotify.com/embed/artist/3i7KKztiuNxSgo146aHLIZ?utm_source=generator&theme=0"
+                        src="https://open.spotify.com/embed/artist/3i7KKztiuNxSgo146aHLIZ?utm_source=generator&theme=0&show-playback-control=true"
                         allowFullScreen={false}
                         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                         loading="lazy"
@@ -663,11 +709,11 @@ export default function Home() {
                  {/* Top Songs Column */}
                  <div className="flex flex-col items-center">
                       <h3 className="text-2xl font-bold mb-4 text-white">Top Global Songs</h3>
-                      <p className="text-sm text-gray-300 mb-6 text-center">Current hits on Spotify.</p>
+                      <p className="text-sm text-gray-300 mb-6 text-center">Current hits on Spotify. <span className="text-xs italic block mt-1">(Log in to Spotify for full song playback)</span></p>
                       {/* Top 50 Playlist iframe embed */}
                       <iframe
                         style={{ borderRadius: '12px', border: 'none', width: '100%', maxWidth: '400px', height: '352px' }}
-                        src="https://open.spotify.com/embed/playlist/37i9dQZEVXbMDoHDwVN2tF?utm_source=generator&theme=0"
+                        src="https://open.spotify.com/embed/playlist/37i9dQZEVXbMDoHDwVN2tF?utm_source=generator&theme=0&show-playback-control=true"
                         allowFullScreen={false}
                         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                         loading="lazy"
@@ -681,7 +727,8 @@ export default function Home() {
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.8 }}
+          transition={{ duration: 0.5, delay: 0.8, ease: "easeOut" }}
+
           className="w-full max-w-7xl my-16 sm:my-24 text-center backdrop-blur-sm bg-black/30 p-6 sm:p-10 rounded-lg border border-white/10"
         >
              <div className="mb-8">
@@ -783,7 +830,10 @@ export default function Home() {
       </div> {/* Close outer audio controls container */}
 
       {/* Render Chatbot */}
-      <Chatbot isOpen={isChatbotOpen} onClose={() => setIsChatbotOpen(false)} />
+      <Chatbot
+        isOpen={isChatbotOpen}
+        onClose={() => setIsChatbotOpen(false)}
+      />
     </> // Closing fragment tag
   );
 } // Closing component function
