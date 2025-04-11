@@ -72,6 +72,7 @@ export default function Home() {
   const [selectedEra, setSelectedEra] = useState('');
   const [selectedMood, setSelectedMood] = useState('');
   const [selectedStructureId, setSelectedStructureId] = useState('verse-chorus'); // Default structure
+  const [selectedFlowPattern, setSelectedFlowPattern] = useState(''); // Flow pattern state
 
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0.1);
@@ -139,7 +140,7 @@ export default function Home() {
     const storyline = storylineInput; // Get storyline
     const contextLyrics = null;
     try {
-      console.log("Sending generation request:", { prompt: promptInput, agents: selectedAgents, genre: selectedGenre, era: selectedEra, mood: selectedMood, storyline, analysis: analysisResult });
+      console.log("Sending generation request:", { prompt: promptInput, agents: selectedAgents, genre: selectedGenre, era: selectedEra, mood: selectedMood, storyline, analysis: analysisResult, flowPattern: selectedFlowPattern });
       const response = await fetch('/api/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -152,7 +153,8 @@ export default function Home() {
               mood: selectedMood,
               storyline: storyline,
               analysis: analysisResult,
-              structureId: selectedStructureId // Send the selected structure ID
+              structureId: selectedStructureId, // Send the selected structure ID
+              flowPattern: selectedFlowPattern // Send the selected flow pattern
           }),
       });
 
@@ -355,12 +357,32 @@ export default function Home() {
            <div className="text-center mb-8">
               <h2 className="text-3xl font-bold mb-2 text-white">AI Lyric Generator & Analyzer</h2>
               <p className="text-md text-gray-300">Write, analyze, and perfect your lyrics with AI.</p>
+              <p className="text-sm text-blue-300 mt-2 italic">"Change your flow and cadence to capture any style you want"</p>
            </div>
            {/* Restoring 3-Column Grid Layout */}
            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 backdrop-blur-lg bg-black/40 p-6 sm:p-8 rounded-xl shadow-2xl border border-white/10">
               {/* --- Left Panel: Generator --- */}
               <div className="flex flex-col gap-4 min-h-[70vh]"> {/* Adjusted gap */}
-                <h3 className="text-xl font-semibold text-white border-b border-white/20 pb-2">AI Generator</h3>
+                <div className="flex justify-between items-center border-b border-white/20 pb-2">
+                  <h3 className="text-xl font-semibold text-white">AI Generator</h3>
+                  <div className="group relative">
+                    <button className="text-gray-300 hover:text-white">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </button>
+                    <div className="absolute z-10 hidden group-hover:block w-64 bg-black/90 text-white text-xs p-2 rounded shadow-lg -right-2 top-6 border border-white/20">
+                      <p className="mb-2">Generate original lyrics by selecting:</p>
+                      <ul className="list-disc list-inside">
+                        <li>Genre, era, and mood</li>
+                        <li>Flow pattern for rhythm & cadence</li>
+                        <li>Song structure for organization</li>
+                        <li>Storyline for narrative direction</li>
+                      </ul>
+                      <p className="mt-2 text-blue-300">Best results come from detailed prompts!</p>
+                    </div>
+                  </div>
+                </div>
                  <div className="flex flex-col gap-2">
                    <label htmlFor="idea-input" className="text-sm font-medium text-gray-300">Your Idea / Prompt:</label>
                    <textarea id="idea-input" placeholder="Enter song concept, theme, or starting lines..." className="w-full p-3 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 resize-none transition-colors duration-200 min-h-[100px]" value={ideaInput} onChange={(e) => setIdeaInput(e.target.value)} disabled={generationLoading} />
@@ -445,7 +467,24 @@ export default function Home() {
 
                   {/* --- Song Structure Dropdown --- */}
                   <div className="flex flex-col gap-1">
-                    <label htmlFor="structure-select" className="text-sm font-medium text-gray-300">Song Structure:</label>
+                    <div className="flex items-center gap-1">
+                      <label htmlFor="structure-select" className="text-sm font-medium text-gray-300">Song Structure:</label>
+                      <div className="group relative inline-block">
+                        <button className="text-gray-400 hover:text-white">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </button>
+                        <div className="absolute z-10 hidden group-hover:block w-64 bg-black/90 text-white text-xs p-2 rounded shadow-lg left-0 top-6 border border-white/20">
+                          <p>Choose how your song is organized:</p>
+                          <ul className="mt-1 list-disc list-inside">
+                            <li>Standard structures like Verse-Chorus</li>
+                            <li>Genre-specific formats for authenticity</li>
+                            <li>Experimental options for unique songs</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
                     <select
                       id="structure-select"
                       className="p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 disabled:opacity-60 transition-colors duration-200"
@@ -477,6 +516,50 @@ export default function Home() {
                     </select>
                   </div>
                   {/* --- End Song Structure Dropdown --- */}
+
+                  {/* --- Flow Pattern Dropdown --- */}
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                      <label htmlFor="flow-pattern-select" className="text-sm font-medium text-gray-300">Flow Pattern:</label>
+                      <div className="group relative inline-block">
+                        <button className="text-gray-400 hover:text-white">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </button>
+                        <div className="absolute z-10 hidden group-hover:block w-64 bg-black/90 text-white text-xs p-2 rounded shadow-lg left-0 top-6 border border-white/20">
+                          <p>Select a rhythm and cadence style:</p>
+                          <ul className="mt-1 space-y-1">
+                            <li><span className="text-blue-300">Triplet:</span> Three syllables in two beats (Migos)</li>
+                            <li><span className="text-blue-300">Double-Time:</span> Fast-paced delivery</li>
+                            <li><span className="text-blue-300">Melodic:</span> Singing-rapping hybrid</li>
+                            <li><span className="text-blue-300">Choppy:</span> Staccato with deliberate pauses</li>
+                          </ul>
+                          <p className="mt-1 text-gray-400 italic">Match flow to genre for best results!</p>
+                        </div>
+                      </div>
+                    </div>
+                    <select
+                      id="flow-pattern-select"
+                      className="p-2 rounded bg-black/50 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-100 disabled:opacity-60 transition-colors duration-200"
+                      disabled={generationLoading}
+                      value={selectedFlowPattern}
+                      onChange={(e) => setSelectedFlowPattern(e.target.value)}
+                    >
+                      <option value="">Any (Default)</option>
+                      <option value="standard">Standard (Regular rhythm)</option>
+                      <option value="triplet">Triplet Flow (Migos style)</option>
+                      <option value="double-time">Double-Time (Fast-paced)</option>
+                      <option value="choppy">Choppy (Staccato with pauses)</option>
+                      <option value="melodic">Melodic (Singing-rapping hybrid)</option>
+                      <option value="syncopated">Syncopated (Off-beat emphasis)</option>
+                      <option value="percussive">Percussive (Words as rhythm)</option>
+                      <option value="laid-back">Laid-Back (Behind the beat)</option>
+                      <option value="push-ahead">Push-Ahead (Ahead of beat)</option>
+                      <option value="call-response">Call & Response (Q&A pattern)</option>
+                    </select>
+                  </div>
+                  {/* --- End Flow Pattern Dropdown --- */}
                  {/* Storyline Input */}
                  <div className="flex flex-col gap-2">
                    <label htmlFor="storyline-input" className="text-sm font-medium text-gray-300">Storyline / Narrative (Optional):</label>
@@ -516,7 +599,26 @@ export default function Home() {
 
               {/* --- Middle Panel: Analyzer --- */}
               <div className="flex flex-col gap-5 min-h-[70vh]">
-                 <h3 className="text-xl font-semibold text-white border-b border-white/20 pb-2">Lyric Analyzer</h3>
+                <div className="flex justify-between items-center border-b border-white/20 pb-2">
+                  <h3 className="text-xl font-semibold text-white">Lyric Analyzer</h3>
+                  <div className="group relative">
+                    <button className="text-gray-300 hover:text-white">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </button>
+                    <div className="absolute z-10 hidden group-hover:block w-64 bg-black/90 text-white text-xs p-2 rounded shadow-lg -right-2 top-6 border border-white/20">
+                      <p className="mb-2">Analyze existing lyrics to understand:</p>
+                      <ul className="list-disc list-inside">
+                        <li>Syllable patterns & rhythm</li>
+                        <li>Rhyme schemes & techniques</li>
+                        <li>Flow characteristics & complexity</li>
+                        <li>Emotional tone & delivery style</li>
+                      </ul>
+                      <p className="mt-2 text-blue-300">Use "This Flow" to generate new lyrics with similar patterns!</p>
+                    </div>
+                  </div>
+                </div>
                  {/* Annotations Input Removed */}
                  {/* Lyric Input */}
                  <div className="flex flex-col gap-2 flex-grow">
@@ -618,7 +720,26 @@ export default function Home() {
 
               {/* --- Right Panel: AI Writing Team (Checkboxes Restored) --- */}
               <div className="flex flex-col gap-5 min-h-[70vh]">
-                <h3 className="text-xl font-semibold text-white border-b border-white/20 pb-2">AI Writing Team</h3>
+                <div className="flex justify-between items-center border-b border-white/20 pb-2">
+                  <h3 className="text-xl font-semibold text-white">AI Writing Team</h3>
+                  <div className="group relative">
+                    <button className="text-gray-300 hover:text-white">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </button>
+                    <div className="absolute z-10 hidden group-hover:block w-64 bg-black/90 text-white text-xs p-2 rounded shadow-lg -right-2 top-6 border border-white/20">
+                      <p className="mb-2">Select specialized AI writers:</p>
+                      <ul className="list-disc list-inside">
+                        <li>Each writer specializes in a genre</li>
+                        <li>Combine multiple writers for fusion styles</li>
+                        <li>Ava Clarke integrates all perspectives</li>
+                        <li>Writers are trained on genre-specific lyrics</li>
+                      </ul>
+                      <p className="mt-2 text-blue-300">Mix writers for unique cross-genre results!</p>
+                    </div>
+                  </div>
+                </div>
                 <div className="space-y-3 flex-grow overflow-y-auto pr-2">
                     {availableAgents.map(agent => (
                         <div key={agent.id} className="flex items-start gap-3 p-3 rounded hover:bg-white/10 transition-colors duration-150">
@@ -665,6 +786,70 @@ export default function Home() {
                  <div className="bg-white/5 p-4 rounded-lg border border-white/10 backdrop-blur-sm">
                     <h4 className="text-lg font-semibold mb-2 text-white">Guided Writing</h4>
                     <p className="text-sm text-gray-300">Use analysis results to guide AI generation for consistent style and structure.</p>
+                </div>
+            </div>
+        </motion.section>
+
+        {/* --- Best Practices Section --- */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5, ease: "easeOut" }}
+          className="w-full max-w-4xl my-16 sm:my-24 backdrop-blur-sm bg-black/30 p-6 sm:p-8 rounded-lg border border-white/10"
+        >
+            <h2 className="text-3xl font-bold mb-6 text-white text-center">Best Practices</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 className="text-xl font-semibold mb-4 text-white">Getting the Best Results</h3>
+                    <ul className="space-y-3">
+                        <li className="flex items-start gap-2">
+                            <span className="text-blue-300 font-bold text-lg">1.</span>
+                            <div>
+                                <p className="text-white font-medium">Be Specific in Your Prompts</p>
+                                <p className="text-sm text-gray-300">Include themes, emotions, and specific imagery you want in your lyrics.</p>
+                            </div>
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <span className="text-blue-300 font-bold text-lg">2.</span>
+                            <div>
+                                <p className="text-white font-medium">Match Flow to Genre</p>
+                                <p className="text-sm text-gray-300">Use triplet flow for trap, melodic for R&B, choppy for drill, etc.</p>
+                            </div>
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <span className="text-blue-300 font-bold text-lg">3.</span>
+                            <div>
+                                <p className="text-white font-medium">Combine Writers for Fusion</p>
+                                <p className="text-sm text-gray-300">Select multiple AI writers to create unique cross-genre styles.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 className="text-xl font-semibold mb-4 text-white">Advanced Techniques</h3>
+                    <ul className="space-y-3">
+                        <li className="flex items-start gap-2">
+                            <span className="text-blue-300 font-bold text-lg">4.</span>
+                            <div>
+                                <p className="text-white font-medium">Analyze Before Generating</p>
+                                <p className="text-sm text-gray-300">Analyze existing lyrics you like, then use "This Flow" to create similar patterns.</p>
+                            </div>
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <span className="text-blue-300 font-bold text-lg">5.</span>
+                            <div>
+                                <p className="text-white font-medium">Iterate and Refine</p>
+                                <p className="text-sm text-gray-300">Generate multiple versions, analyze each, and combine the best elements.</p>
+                            </div>
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <span className="text-blue-300 font-bold text-lg">6.</span>
+                            <div>
+                                <p className="text-white font-medium">Add a Detailed Storyline</p>
+                                <p className="text-sm text-gray-300">The narrative direction helps create more cohesive and meaningful lyrics.</p>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </motion.section>

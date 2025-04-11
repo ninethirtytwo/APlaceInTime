@@ -16,6 +16,20 @@ interface AnalysisContext {
   [key: string]: unknown; // Use unknown instead of any for index signature
 }
 
+// Define flow pattern descriptions
+const FLOW_PATTERNS: Record<string, string> = {
+  'standard': 'Regular rhythm with evenly spaced syllables',
+  'triplet': 'Three syllables in the space of two beats (like Migos)',
+  'double-time': 'Twice as many syllables per beat, creating a fast-paced delivery',
+  'choppy': 'Staccato delivery with deliberate pauses between words or phrases',
+  'melodic': 'Singing-rapping hybrid with pitch variation and melodic elements',
+  'syncopated': 'Emphasis on off-beats, creating a bouncy, unpredictable rhythm',
+  'percussive': 'Using words as percussion instruments, emphasizing consonant sounds',
+  'laid-back': 'Slightly behind the beat, creating a relaxed, effortless feel',
+  'push-ahead': 'Slightly ahead of the beat, creating an urgent, energetic feel',
+  'call-response': 'Question-answer pattern, often with contrasting delivery styles'
+};
+
 // Helper function to build the Claude prompt based on agents, parameters, and analysis context
 function buildAgentPrompt(
     idea: string,
@@ -26,7 +40,8 @@ function buildAgentPrompt(
     contextLyrics?: string | null,
     analysisContext?: AnalysisContext | null, // Use the interface, allow null
     storyline?: string | null, // Add storyline parameter
-    structureId?: string | null // Use structureId instead of structure object
+    structureId?: string | null, // Use structureId instead of structure object
+    flowPattern?: string | null // Add flow pattern parameter
 ): string {
   let prompt = `You are an expert songwriting assistant collaborating with a user, acting as a specific AI writing team member or a lead integrating multiple perspectives. `;
 
@@ -59,6 +74,11 @@ function buildAgentPrompt(
   if (genre) prompt += `The target genre is ${genre}. `;
   if (era) prompt += `The desired era style is ${era}. `;
   if (mood) prompt += `The mood should be ${mood}. `;
+
+  // Add flow pattern instructions if provided
+  if (flowPattern && FLOW_PATTERNS[flowPattern]) {
+    prompt += `\n\nUse a ${flowPattern} flow pattern: ${FLOW_PATTERNS[flowPattern]}. `;
+  }
 
   // Incorporate Analysis Context if provided
   if (analysisContext && typeof analysisContext === 'object' && Object.keys(analysisContext).length > 0 && !analysisContext.error) {
@@ -143,7 +163,7 @@ function buildAgentPrompt(
 
 export async function POST(request: Request) {
   try {
-    const { prompt: idea, context, agents, genre, era, mood, storyline, analysis, structureId } = await request.json(); // Use structureId
+    const { prompt: idea, context, agents, genre, era, mood, storyline, analysis, structureId, flowPattern } = await request.json(); // Added flowPattern
 
     // Basic validation
     if (!idea || typeof idea !== 'string') {
@@ -157,7 +177,7 @@ export async function POST(request: Request) {
     const model = "claude-3-5-sonnet-20240620"; // Corrected typo: Use hyphens instead of period
 
     // Build the dynamic prompt using the helper function
-    const finalPrompt = buildAgentPrompt(idea, agents, genre || '', era || '', mood || '', context, analysis, storyline, structureId); // Pass structureId
+    const finalPrompt = buildAgentPrompt(idea, agents, genre || '', era || '', mood || '', context, analysis, storyline, structureId, flowPattern); // Pass flowPattern
 
     console.log(`Sending final prompt to Claude (length: ${finalPrompt.length}): ${finalPrompt.substring(0, 300)}...`); // Log beginning of prompt
 
