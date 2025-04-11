@@ -1,0 +1,18 @@
+[Intro]
+This is a sample song by Taylor Swift
+For testing our preprocessing script
+
+[Verse 1]
+These are sample lyrics
+For testing purposes only
+Not actual Taylor Swift lyrics
+
+[Chorus]
+This is the chorus part
+It should be preserved
+But the tags should be removed
+
+[Bridge]
+This is the bridge section
+With more sample text
+For testing our script

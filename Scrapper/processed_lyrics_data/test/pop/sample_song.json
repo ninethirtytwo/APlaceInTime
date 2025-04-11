@@ -1,0 +1,8 @@
+{
+  "metadata": {
+    "title": "sample_song",
+    "artist": "taylor swift",
+    "original_file": "lyrics_data\\pop\\taylor_swift\\sample_song.txt"
+  },
+  "lyrics": "This is a sample song by Taylor Swift\nFor testing our preprocessing script\n\nThese are sample lyrics\nFor testing purposes only\nNot actual Taylor Swift lyrics\n\nThis is the chorus part\nIt should be preserved\nBut the tags should be removed\n\nThis is the bridge section\nWith more sample text\nFor testing our script"
+}

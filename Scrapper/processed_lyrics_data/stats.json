@@ -1,0 +1,34 @@
+{
+  "hiphop": {
+    "genre": "hiphop",
+    "total_songs": 1,
+    "total_artists": 1,
+    "artists": {
+      "kendrick lamar": {
+        "total_songs": 1,
+        "train_songs": 0,
+        "val_songs": 0,
+        "test_songs": 1
+      }
+    },
+    "train_count": 0,
+    "val_count": 0,
+    "test_count": 1
+  },
+  "pop": {
+    "genre": "pop",
+    "total_songs": 1,
+    "total_artists": 1,
+    "artists": {
+      "taylor swift": {
+        "total_songs": 1,
+        "train_songs": 0,
+        "val_songs": 0,
+        "test_songs": 1
+      }
+    },
+    "train_count": 0,
+    "val_count": 0,
+    "test_count": 1
+  }
+}

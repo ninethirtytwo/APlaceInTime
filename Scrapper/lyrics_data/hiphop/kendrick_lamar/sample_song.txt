@@ -1,0 +1,14 @@
+[Verse 1]
+This is a sample song by Kendrick Lamar
+For testing our preprocessing script
+We need to make sure it works correctly
+
+[Chorus]
+This is the chorus
+It should be preserved
+But the tags should be removed
+
+[Verse 2]
+Here's another verse
+With more sample lyrics
+To test our preprocessing

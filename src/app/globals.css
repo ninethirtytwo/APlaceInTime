@@ -18,14 +18,27 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* Removed duplicate body styles and combined them */
+/* Simple body styles with slight blur */
 body {
   color: var(--foreground);
-  background-image: var(--bg-image); /* Use CSS variable for background image */
-  background-size: cover;
-  background-position: center center;
-  background-attachment: fixed; /* Keep background fixed during scroll */
-  background-repeat: no-repeat;
+  position: relative;
   min-height: 100vh;
   transition: background-image 0.5s ease-in-out; /* Smooth transition between backgrounds */
+}
+
+/* Background with slight blur */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-image: var(--bg-image);
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  filter: blur(3px); /* Just a slight blur */
 }

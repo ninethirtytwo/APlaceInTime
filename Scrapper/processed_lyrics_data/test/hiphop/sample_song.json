@@ -1,0 +1,8 @@
+{
+  "metadata": {
+    "title": "sample_song",
+    "artist": "kendrick lamar",
+    "original_file": "lyrics_data\\hiphop\\kendrick_lamar\\sample_song.txt"
+  },
+  "lyrics": "This is a sample song by Kendrick Lamar\nFor testing our preprocessing script\nWe need to make sure it works correctly\n\nThis is the chorus\nIt should be preserved\nBut the tags should be removed\n\nHere's another verse\nWith more sample lyrics\nTo test our preprocessing"
+}
